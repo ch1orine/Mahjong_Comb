@@ -1,32 +1,22 @@
 import { _decorator, Component, Node, EventTouch, Vec3 } from "cc";
 import { EventBus } from "../../../event/EventBus";
-const { ccclass, property } = _decorator;
+import { BlockEvent } from "../BlockEvent";
+const { ccclass } = _decorator;
 
 @ccclass("BlockBll")
 export class BlockBll extends Component {
-  private _canDrag: boolean = true; //是否可以拖拽
-
-  private _isDragging: boolean = false; //是否正在拖拽
-
-  private _originalPosition: Vec3; //记录初始位置
-
-  onLoad() {
-    this.node.on(Node.EventType.TOUCH_START, this.OnTouchStart, this);
-    this.node.on(Node.EventType.TOUCH_MOVE, this.OnTouchMove, this);
-    this.node.on(Node.EventType.TOUCH_END, this.OnTouchEnd, this);
-    this.node.on(Node.EventType.TOUCH_CANCEL, this.OnTouchEnd, this);    
+ 
+  protected onLoad(): void {
+    //test only
+    EventBus.instance.on(BlockEvent.CheckPosValid, this.checkPositionValid, this);
   }
 
-  private OnTouchStart(event: EventTouch) {
-    console.log("Touch Start");
-    EventBus.instance.emit(EventBus.Combine, 3, 3);
-  }
+  private checkPositionValid(pos: Vec3) {    
+    console.log("Bll_checking position valid..."); 
+    //调用blockmanager的检测方法，即发送事件通知blockmanager
 
-  private OnTouchMove(event: EventTouch) {
-    console.log("Touch Move");
-  }
-
-  private OnTouchEnd(event: EventTouch) {
-    console.log("Touch End");
+    //检测逻辑
+    //判定当前位置接触到-1格子时立刻发送 invalid事件，view层响应
+    //若为可消除位置，立刻执行 发送valid事件，view层响应
   }
 }

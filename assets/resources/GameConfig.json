@@ -1,0 +1,5 @@
+{    
+  "threeStepS": true,
+  "stepsToJump": 3,
+  "testStr": "测试字符串"
+}

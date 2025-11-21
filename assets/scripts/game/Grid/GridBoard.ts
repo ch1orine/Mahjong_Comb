@@ -48,12 +48,14 @@ export class GridBoard extends Component {
       );
     }
 
-    this.drawGrid();
-
+    
     EventBus.instance.on("combine", this.removeLines3x3, this);
-
+    
     // this.removeLines3x3(3,3);
     this.removeLines3x3(2,2);
+    // this._removedHorizontalSegments.add("4_2_3");
+    // this._removedVerticalSegments.add(`4_6_7`);
+    this.drawGrid();
   }
 
   /**
@@ -239,7 +241,7 @@ export class GridBoard extends Component {
         // 移除该横线在3x3区域列范围内的所有线段
         for (let c = minCol; c <= maxCol; c++) {
           if (c < this.cols) {
-            const key = `${lineIdx}_${c}_${c + 1}`;
+            const key = `${lineIdx}_${c}_${c + 1}`;            
             this._removedHorizontalSegments.add(key);
           }
         }
@@ -255,7 +257,7 @@ export class GridBoard extends Component {
         // 移除该竖线在3x3区域行范围内的所有线段
         for (let r = minRow; r <= maxRow; r++) {
           if (r < this.rows) {
-            const key = `${lineIdx}_${r}_${r + 1}`;
+            const key = `${lineIdx}_${r}_${r + 1}`;            
             this._removedVerticalSegments.add(key);
           }
         }

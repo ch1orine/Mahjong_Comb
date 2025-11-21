@@ -11,6 +11,10 @@ import {
 import { Block } from "../block/Block";
 
 export class BlockManager {
+
+  blockdata
+
+
   /** 创建砖块对象 */
   public createBlock(data: any) {
     resources.load("prefabs/block", Prefab, (err, prefab) => {
