@@ -6,7 +6,6 @@ import {
   Prefab,
   resources,
 } from "cc";
-import { Block } from "./block/Block";
 import { BlockManager } from "./manager/BlockManager";
 const { ccclass, property } = _decorator;
 
@@ -19,9 +18,8 @@ export class test extends Component {
       }
       const node = instantiate(prefab);
       node.parent = this.node;
+      const manager = new BlockManager();
+      manager.init();
     });
-
-    const node = new BlockManager();
-    node.createBlock({ id: 9 });
   }
 }

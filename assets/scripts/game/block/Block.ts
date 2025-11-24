@@ -27,20 +27,28 @@ export class Block extends Component {
 
   protected onLoad(): void {    
     this.model = this.addComponent(BlockModel);
+    this.view = this.getComponent(BlockView);
     this.bll = this.addComponent(BlockBll);    
   }
 
+  /** 加载显示图并初始化位置
+   * @param parent 父节点
+   * @param pos 位置
+   */
   load(parent: Node, pos: Vec3 = Vec3.ZERO) {
     resources.load(`blocks/0${this.model.id}/spriteFrame`, SpriteFrame, (err, sf) => {
       if (err) {
         console.error(err);
         return;
       }
-      this.view = this.getComponent(BlockView);
+      
       this.view.sprite.spriteFrame = sf;
       this.node.parent = parent;
       this.node.setPosition(pos);
     });
   }
 
+  public returnOriginalPosition(){
+    
+  }
 }

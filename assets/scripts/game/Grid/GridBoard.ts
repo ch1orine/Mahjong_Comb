@@ -1,5 +1,6 @@
 import { _decorator, Component, Graphics, UITransform, Color } from "cc";
 import { EventBus } from "../../event/EventBus";
+import { GridEvent } from "./GridEvent";
 const { ccclass, property } = _decorator;
 
 /**
@@ -49,12 +50,12 @@ export class GridBoard extends Component {
     }
 
     
-    EventBus.instance.on("combine", this.removeLines3x3, this);
+    EventBus.instance.on(GridEvent.WipeGrid, this.removeLines3x3, this);
     
     // this.removeLines3x3(3,3);
-    this.removeLines3x3(2,2);
+    // this.removeLines3x3(2,2);
     // this._removedHorizontalSegments.add("4_2_3");
-    // this._removedVerticalSegments.add(`4_6_7`);
+    this._removedVerticalSegments.add(`4_8_9`);
     this.drawGrid();
   }
 
@@ -226,6 +227,8 @@ export class GridBoard extends Component {
    * @param col 列索引（0-based），作为9宫格的中心点
    */
   public removeLines3x3(row: number, col: number): void {
+    //修改映射,graphics从左下角开始，数组从左上角开始
+    row = this.rows - 1 - row;
     // 计算3x3区域的范围（以传入坐标为中心）
     const minRow = Math.max(0, row - 1);
     const maxRow = Math.min(this.rows - 1, row + 1);

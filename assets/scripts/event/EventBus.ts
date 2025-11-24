@@ -32,8 +32,7 @@ export class EventBus extends EventTarget {
   public static StartInteract = "startInteract"; //开始交互事件
 
   public static AddScore = "addScore"; //增加分数事件
-
-  public static Combine = "combine"; //组合方块事件
+  
 
   
   private static _instance: EventBus;

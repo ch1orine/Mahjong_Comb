@@ -6,10 +6,10 @@ export class BlockModel extends Component {
     /** 砖块编号 */
     id: number = -1;
 
-    /** 砖块位置{x,y} */
-    x: number = 0;
+    /** 砖块位置{r,c} */
+    row: number = 0;
 
-    y: number = 0;
+    col: number = 0;
 
 
 
@@ -17,8 +17,8 @@ export class BlockModel extends Component {
     reset(){
         this.id = -1;
 
-        this.x = 0;
-        this.y = 0;
+        this.row = 0;
+        this.col = 0;
     }
 }
 
