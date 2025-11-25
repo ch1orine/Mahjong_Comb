@@ -4,6 +4,7 @@ import { BlockManager } from "../BlockManager";
 import { EventBus } from "../../../event/EventBus";
 import { BlockEvent } from "../../block/BlockEvent";
 import { BlockManagerModel } from "../model/BlockManagerModel";
+import { JumpEvent } from "../../jump/JumpEvent";
 
 export class BlockManagerBll {
   /** 创建砖块对象 */
@@ -59,6 +60,7 @@ export class BlockManagerBll {
       e.BlockManagerModel.getBlock(selfRow, selfCol).node.active = false;
       e.BlockManagerModel.getBlock(row, col).node.active = false;
       e.onWipeHandler(col, row);
+      EventBus.instance.emit(JumpEvent.onJump);
     }
     else {
       EventBus.instance.emit(BlockEvent.InvalidDrag);

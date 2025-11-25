@@ -47,8 +47,4 @@ export class Block extends Component {
       this.node.setPosition(pos);
     });
   }
-
-  public returnOriginalPosition(){
-    
-  }
 }

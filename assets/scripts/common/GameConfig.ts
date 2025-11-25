@@ -41,13 +41,6 @@ export default class GameConfig {
             : false;
     }
 
-      /** 是否为移动模式 */
-    public getMoveMode(): boolean {
-        return this.configData && typeof this.configData.moveMode === 'boolean'
-            ? this.configData.moveMode
-            : false;
-    }
-
     /** 获取测试选择值 */
     public getStepsToJump(): number {
         return this.configData && typeof this.configData.stepsToJump === 'number'
@@ -60,21 +53,6 @@ export default class GameConfig {
         return this.configData && typeof this.configData.testStr === 'string'
             ? this.configData.testStr
             : '';
-    }
-
-    /** 获取多语言配置字符串 */
-    public getLanguage(): string {
-        return this.configData && typeof this.configData.language === 'string'
-            ? this.configData.language
-            : '';
-    }
-
-
-    /** 获取移动速度 */
-    public getMoveSpeed(): number {
-        return this.configData && typeof this.configData.movespeed === 'number'
-            ? this.configData.movespeed
-            : 0;
     }
 
     /** 
