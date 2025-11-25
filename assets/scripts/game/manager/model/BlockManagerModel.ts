@@ -28,7 +28,7 @@ export class BlockManagerModel {
       [6, 7, 9, 4, 4, 5, 2, 8],
       [2, 8, 9, 6, 6, 4, 1, 8],
       [6, 3, 9, 1, 5, 4, 1, 9],
-      [6, 5, 7, 4, 4, 7, 3, 7],
+      [6, 5, 7, 5, 5, 7, 3, 7],
       [3, 5, 4, 6, 4, 3, 1, 9],
       [1, 8, 7, 3, 3, 3, 7, 4],
       [6, 5, 9, 5, 5, 4, 9, 4],
@@ -67,21 +67,16 @@ export class BlockManagerModel {
   }
 
   /** 更新障碍格子值
-   * @param x 横坐标
-   * @param y 纵坐标
+   * @param row 横坐标
+   * @param col 纵坐标
    * @param val 新值
    */
-  updateBarrierValue(x: number, y: number) {
-    if (
-      x < 0 ||
-      x >= this._barrier[0].length ||
-      y < 0 ||
-      y >= this._barrier.length
-    ) {
+  updateBarrierValue(row: number, col: number) {
+    if (row < 0 || row >= this._barrier.length ||col < 0 || col >= this._barrier[0].length) {
       console.error("GridBarrier update: Invalid coordinates");
       return;
     }
-    this._barrier[y][x] = 1;
+    this._barrier[row][col] = 1;    
   }
 
   /** 获取地图格子值
@@ -103,18 +98,24 @@ export class BlockManagerModel {
   }
 
   /** 更新地图格子值
-   * @param x 横坐标
-   * @param y 纵坐标
+   * @param row 横坐标
+   * @param col 纵坐标
    * @param val 新值
    */
-  updateMapValue(x: number, y: number, val: number = 0) {
-    if (x < 0 || x >= this._map[0].length || y < 0 || y >= this._map.length) {
+  updateMapValue(row: number, col: number, val: number = 0) {    
+    if (row < 0 || row >= this._map.length || col < 0 || col >= this._map[0].length) {
       console.error("GridMap update: Invalid coordinates");
       return;
     }
-    this._map[y][x] = val;
+    this._map[row][col] = val;    
   }
 
+
+    /** 获取索引砖块     
+     * @param row 横坐标
+     * @param col 纵坐标
+     * @returns 砖块对象
+     */
   getBlock(row: number, col: number): Block{
     return this.blocks.find(block=>block.model.row === row && block.model.col === col);
   }

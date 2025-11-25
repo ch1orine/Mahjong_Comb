@@ -39,8 +39,7 @@ export class BlockManagerBll {
     const selfRow = Math.round(6 - originPos.y / 85);
     const pass = e.BlockManagerModel.barrier[row]?.[col];
     const val = e.BlockManagerModel.map[row]?.[col];
-    const originVal = e.BlockManagerModel.map[selfRow]?.[selfCol];
-    console.log(`目标${row} 列 ${col}${val}，原位置行 ${selfRow} 列 ${selfCol}`);
+    const originVal = e.BlockManagerModel.map[selfRow]?.[selfCol];    
     if (col == selfCol && row == selfRow){
       return;
     }
@@ -48,20 +47,15 @@ export class BlockManagerBll {
       return;
     }   
     
-
     //为通路时继续移动，不处理
     if(pass === 1 && val === 0){
       return;
     }
 
     //首先为通路，然后同行或同列，最后值相等或加和为10
-    if (pass === 1 && (row === selfRow || col === selfCol)  && (val == originVal || val + originVal === 10) ) {
-      // EventBus.instance.emit(BlockEvent.ValidDrag);
-      // console.log(`位置合理，行 ${row} 列 ${col}`);
-      // console.log(`原位置，行 ${selfRow} 列 ${selfCol}`);
-      e.BlockManagerModel.updateMapValue(selfRow, selfCol, 0);//坐标有bug
-      e.BlockManagerModel.updateMapValue(row, col, 0);//坐标有bug 明天修复
-      // EventBus.instance.emit(BlockEvent.ValidDrag);
+    if (pass === 1 && (row === selfRow || col === selfCol) && this.checkPassable(e, row, col, selfRow, selfCol) && (val == originVal || val + originVal === 10) ) {
+      e.BlockManagerModel.updateMapValue(selfRow, selfCol);
+      e.BlockManagerModel.updateMapValue(row, col);
       e.BlockManagerModel.getBlock(selfRow, selfCol).node.active = false;
       e.BlockManagerModel.getBlock(row, col).node.active = false;
       e.onWipeHandler(col, row);
@@ -86,5 +80,33 @@ export class BlockManagerBll {
           }
         }
       }
+    }
+
+
+    private checkPassable(e: BlockManager, row: number, col: number, originRow: number, originCol: number): boolean {
+      if (row === originRow){
+        if(Math.abs(col - originCol) <= 1){
+          return true;
+        }  
+        const [minC, maxC] = col < originCol ? [col, originCol] : [originCol, col];
+        for (let c = minC + 1; c < maxC; c++) {
+          const pass = e.BlockManagerModel.map[row]?.[c];
+          if (pass !== 0) {
+            return false;
+          }
+        }
+      }else{
+         if(Math.abs(row - originRow) <= 1){
+          return true;
+        }    
+        const [minR, maxR] = row < originRow ? [row, originRow] : [originRow, row];
+        for (let r = minR + 1; r < maxR; r++) {
+          const pass = e.BlockManagerModel.map[r]?.[col];
+          if (pass !== 0) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
 }
