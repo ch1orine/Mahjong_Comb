@@ -19,6 +19,9 @@ export class Wipe extends Component {
 
   private _colorTrack!: any;
 
+  private _row: number = 0;
+  private _col: number = 0;
+
   protected onLoad(): void {
     this._animation = this.node.getComponent(Animation);
     this._colorTrack = this._animation.clips[0].tracks[1];
@@ -32,9 +35,11 @@ export class Wipe extends Component {
     );
   }
 
-  public playWipeEffect() {
+  public playWipeEffect(row: number, col: number) {
     this.node.active = true;
     this._animation.play("wipe");
+    this._row = row;
+    this._col = col;
   }
 
   private modifyColorAtTime(colorTrack: any, time: number, newColor: Color) {
@@ -54,8 +59,6 @@ export class Wipe extends Component {
   }
 
   onDrawGrid() {
-    const col = Math.round(this.node.position.x / 85 + 3.5);
-    const row = Math.round(6 - this.node.position.y / 85);
-    EventBus.instance.emit(BlockManagerEvent.onWipeComplete, col, row);
+    EventBus.instance.emit(BlockManagerEvent.onWipeComplete, this._col, this._row);
   }
 }

@@ -45,23 +45,13 @@ export class BlockManagerView {
 
   public showWipeEffect(pos: { x: number; y: number }) {
     if (!this._wipe) return;
-    this._wipe.setPosition(pos.x + 50, pos.y, 0);
-
+    const row = Math.round(6 - pos.y / 85);
+    const col = Math.round(pos.x / 85 + 3.5);
+    this._wipe.setPosition(pos.x - 50, pos.y, 0);//todo xoffset yoffset
     const wipe = this._wipe.getComponent(Wipe); 
     setTimeout(() => {    
-        wipe.playWipeEffect();
-    }, 200);      
-    // wipe.on(Animation.EventType.FINISHED, () => {
-    //     this._wipe.active = false;
-    // //   EventBus.instance.emit(BlockManagerEvent.onWipeComplete, col, row);
-    // });
-    // this._wipe.active = true;
-    // const spine = this._wipe.getComponent(sp.Skeleton);
-    // spine.setAnimation(0,'animation',false);
-    // spine.setCompleteListener(()=>{
-    //     this._wipe.active = false;
-    //     EventBus.instance.emit(BlockManagerEvent.onWipeComplete,col,row);
-    // });
+        wipe.playWipeEffect(row, col);
+    }, 200);      //明天添加字体放大效果
   }
 
 
