@@ -1,3 +1,4 @@
+import { Vec3 } from "cc";
 import { Block } from "../../block/Block";
 export class BlockManagerModel {
   // blocks:
@@ -119,4 +120,5 @@ export class BlockManagerModel {
   getBlock(row: number, col: number): Block{
     return this.blocks.find(block=>block.model.row === row && block.model.col === col);
   }
+
 }

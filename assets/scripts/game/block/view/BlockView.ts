@@ -3,12 +3,13 @@ import {
   Component,
   EventTouch,
   Node,
-  Sprite,
+  Sprite,  
   tween,
   Vec3,
 } from "cc";
 import { EventBus } from "../../../event/EventBus";
 import { BlockEvent } from "../BlockEvent";
+import { GuideEvent } from "../../guide/GuideEven";
 const { ccclass, property } = _decorator;
 
 @ccclass("BlockView")
@@ -34,13 +35,14 @@ export class BlockView extends Component {
     this.node.on(Node.EventType.TOUCH_START, this.OnTouchStart, this);
     this.node.on(Node.EventType.TOUCH_MOVE, this.OnTouchMove, this);
     this.node.on(Node.EventType.TOUCH_END, this.OnTouchEnd, this);
-    this.node.on(Node.EventType.TOUCH_CANCEL, this.OnTouchEnd, this);
+    // this.node.on(Node.EventType.TOUCH_CANCEL, this.OnTouchEnd, this);
   }
 
   private OnTouchStart(event: EventTouch) {
     if (!this._canDrag) {
       return;
     }
+    EventBus.instance.emit(GuideEvent.StopShowGuide);
     this._isDragging = true;    
     this._originalPosition = this.node.position.clone();
     EventBus.instance.on(BlockEvent.InvalidDrag, this.inValidHandler, this);
@@ -65,11 +67,13 @@ export class BlockView extends Component {
     this.inValidHandler();
     this.node.off(BlockEvent.InvalidDrag, this.inValidHandler, this);
     this.node.off(BlockEvent.ValidDrag, this.validHandler, this);
+
+    EventBus.instance.emit(EventBus.UpdateTimer);
   }
 
   /** 位置不合理 block回归原位置（属于表现层） */
   private inValidHandler() {
-    console.log("位置不合理，停止拖动，回归原位置");
+    console.log("玩家取消拖动or位置不合理，回归原位置");
     this._isDragging = false;
     tween(this.node).to(0.2, { position: this._originalPosition }).start();
   }
@@ -78,7 +82,7 @@ export class BlockView extends Component {
   private validHandler() {
     console.log("位置合理，停止拖动，通知bll执行后续逻辑");
     // e._canDrag = false;
-    this.node.destroy();
+    // this.node.destroy();
   }
 
   onDestroy() {

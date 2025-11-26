@@ -26,7 +26,7 @@ export class BlockManagerView {
    */
   constructor() {
     const effectNode = new Node(); //创建一个节点作为 audioMgr
-    effectNode.name = "EffectNode";
+    effectNode.name = "EffectLayer";
     director.getScene().children[0].addChild(effectNode); //添加节点到场景
 
     resources.load(`prefabs/wipe`, Prefab, (err, prefab) => {
@@ -39,8 +39,7 @@ export class BlockManagerView {
       this._wipe.parent = effectNode;
     });
 
-    EventBus.instance.on(BlockManagerEvent.onWipe, this.showWipeEffect, this);
-    // Color.fromHEX(this._color, "#FFFFFF");
+    EventBus.instance.on(BlockManagerEvent.onWipe, this.showWipeEffect, this);    
   }
 
   public showWipeEffect(pos: { row: number; col: number }) {

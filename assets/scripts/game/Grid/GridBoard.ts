@@ -1,6 +1,7 @@
 import { _decorator, Component, Graphics, UITransform, Color } from "cc";
 import { EventBus } from "../../event/EventBus";
 import { GridEvent } from "./GridEvent";
+import { gameConfig } from "../../common/GameConfig";
 const { ccclass, property } = _decorator;
 
 /**
@@ -48,7 +49,7 @@ export class GridBoard extends Component {
         this.rows * this.cellSize
       );
     }
-
+    this.lineColor = Color.fromHEX(new Color(), gameConfig.getColor());
     
     EventBus.instance.on(GridEvent.WipeGrid, this.removeLines3x3, this);
     

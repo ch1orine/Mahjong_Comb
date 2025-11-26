@@ -3,6 +3,7 @@ import super_html_playable from "../../common/super_html_playable";
 import { EventBus } from "../../event/EventBus";
 import { JumpEvent } from "./JumpEvent";
 import { gameConfig } from "../../common/GameConfig";
+import { GuideEvent } from "../guide/GuideEven";
 const { ccclass } = _decorator;
 
 @ccclass("Jump")
@@ -38,11 +39,11 @@ export class Jump extends Component {
     console.log("跳转步骤:", this._steps);
     if (gameConfig.getThreeSteps() && this._steps >= gameConfig.getStepsToJump()) {
       this.onHandler();
+      EventBus.instance.emit(EventBus.GameOver); //游戏结束 
     }
   }
 
-  onHandler() {
-    super_html_playable.download(); //用插件跳转商店下载页  
-    EventBus.instance.emit(EventBus.GameOver); //游戏结束 
+  onHandler() {    
+    super_html_playable.download(); //用插件跳转商店下载页      
   }
 }

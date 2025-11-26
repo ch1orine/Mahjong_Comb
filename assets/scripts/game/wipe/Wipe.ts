@@ -31,7 +31,7 @@ export class Wipe extends Component {
     this.modifyColorAtTime(
       this._colorTrack,
       0,
-      Color.fromHEX(new Color(), gameConfig.getColor())
+      Color.fromHEX(new Color(), "#9676ffff")
     );
   }
 

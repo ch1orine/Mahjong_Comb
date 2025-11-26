@@ -10,6 +10,7 @@ import { BlockEvent } from "../block/BlockEvent";
 import { EventBus } from "../../event/EventBus";
 import { GridEvent } from "../grid/GridEvent";
 import { BlockManagerEvent } from "./BlockManagerEvent";
+import { GuideEvent } from "../guide/GuideEven";
 
 export class BlockManager {
   //数据层
@@ -30,11 +31,15 @@ export class BlockManager {
   init() {
     this.generateBoardLayout();
     this.addEvents();
+
+    //test
+    // this.getGuideBlocks();
   }
 
   private addEvents(){
     EventBus.instance.on(BlockEvent.CheckPosValid, this.checkPositionValid, this);
     EventBus.instance.on(BlockManagerEvent.onWipeComplete, this.onWipeCompleteHandler, this);
+    EventBus.instance.on(GuideEvent.GetGuideBlocks, this.getGuidePos, this);
   }
 
   private checkPositionValid(pos: Vec3, originPos:Vec3) {      
@@ -71,6 +76,13 @@ export class BlockManager {
           block.view.candrag = true;          
         }
       }
+    }
+  }
+
+  public getGuidePos() {    
+    const positions = this.BlockManagerBll.getPassableBlocks(this);
+    if (positions.length > 0) {
+      EventBus.instance.emit(GuideEvent.ShowHand, positions);    
     }
   }
 }

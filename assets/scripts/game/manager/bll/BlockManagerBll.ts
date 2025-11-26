@@ -1,10 +1,11 @@
-import { find, instantiate, Prefab, resources, v3, Vec3 } from "cc";
+import { find, instantiate, Prefab, resources, tween, v3, Vec3 } from "cc";
 import { Block } from "../../block/Block";
 import { BlockManager } from "../BlockManager";
 import { EventBus } from "../../../event/EventBus";
 import { BlockEvent } from "../../block/BlockEvent";
 import { JumpEvent } from "../../jump/JumpEvent";
 import { BlockManagerEvent } from "../BlockManagerEvent";
+import { GuideEvent } from "../../guide/GuideEven";
 
 export class BlockManagerBll {
   /** 创建砖块对象 */
@@ -59,16 +60,20 @@ export class BlockManagerBll {
       EventBus.instance.emit(BlockManagerEvent.onWipe, {row,col});
       e.BlockManagerModel.updateMapValue(selfRow, selfCol);
       e.BlockManagerModel.updateMapValue(row, col);
-      e.BlockManagerModel.getBlock(selfRow, selfCol).node.active = false;
-      e.BlockManagerModel.getBlock(row, col).node.active = false;
-      // e.onWipeHandler(col, row);
+      const b1 = e.BlockManagerModel.getBlock(selfRow, selfCol);
+      const b2 = e.BlockManagerModel.getBlock(row, col);
+      b1.wipeEffect();
+      b2.wipeEffect();  
+      b1.stopResponse();
+      b2.stopResponse();
+      EventBus.instance.emit(EventBus.UpdateTimer);
     }
     else {
       EventBus.instance.emit(BlockEvent.InvalidDrag);
     }
   }
 
-    public onWipeHandler(e:BlockManager, col: number, row: number) {              
+  public onWipeHandler(e:BlockManager, col: number, row: number) {              
       const minCol = Math.max(0, col - 1);
       const maxCol = Math.min(7, col + 1);
       const minRow = Math.max(0, row - 1);
@@ -83,10 +88,10 @@ export class BlockManagerBll {
           }
         }
       }
-    }
+  }
 
 
-    private checkPassable(e: BlockManager, row: number, col: number, originRow: number, originCol: number): boolean {
+  private checkPassable(e: BlockManager, row: number, col: number, originRow: number, originCol: number): boolean {
       if (row === originRow){
         if(Math.abs(col - originCol) <= 1){
           return true;
@@ -111,5 +116,74 @@ export class BlockManagerBll {
         }
       }
       return true;
+  }
+
+
+  /**
+   * 查找所有可通行且可消除的方块组合
+   * 规则：
+   * 1. barrier[row][col] === 1 且 map[row][col] !== 0
+   * 2. 检查下方和右方相邻位置
+   * 3. 相邻位置也满足 barrier === 1 && map !== 0
+   * 4. 且值相等或相加为10
+   */
+  public getPassableBlocks(e: BlockManager): Vec3[] {
+    const passableBlocks: Vec3[] = [];
+    
+    for (let row = e.BlockManagerModel.barrier.length - 1; row > 0; row--) {
+      for (let col = 0; col < e.BlockManagerModel.barrier[0].length; col++) {
+        // 检查当前位置：barrier为1且map不为0
+        if (e.BlockManagerModel.barrier[row][col] === 1 && e.BlockManagerModel.map[row][col] !== 0) {
+          const currentValue = e.BlockManagerModel.map[row][col];
+          const currentBlock = e.BlockManagerModel.getBlock(row, col);
+          
+          if (!currentBlock) continue;
+          
+          // 检查右方位置 (row, col + 1)
+          if (col + 1 < e.BlockManagerModel.barrier[0].length) {
+            if (this.checkAdjacentMatch(e, row, col + 1, currentValue)) {
+              const adjacentBlock = e.BlockManagerModel.getBlock(row, col + 1);
+              if (adjacentBlock && !passableBlocks.includes(currentBlock.node.position)&& !passableBlocks.includes(adjacentBlock.node.position)) {
+                passableBlocks.push(currentBlock.node.position);
+                passableBlocks.push(adjacentBlock.node.position);                
+                return passableBlocks;
+              }           
+            }
+          }
+
+          // 检查下方位置 (row + 1, col)
+          if (row + 1 < e.BlockManagerModel.barrier.length) {
+            if (this.checkAdjacentMatch(e, row - 1, col, currentValue)) {
+              const adjacentBlock = e.BlockManagerModel.getBlock(row - 1, col);
+              if (adjacentBlock && !passableBlocks.includes(currentBlock.node.position)&& !passableBlocks.includes(adjacentBlock.node.position)) {
+                passableBlocks.push(adjacentBlock.node.position);
+                passableBlocks.push(currentBlock.node.position);                
+                return passableBlocks;
+              }
+            }
+          }                   
+        }
+      }
     }
+    
+    return passableBlocks;
+  }
+  
+  /**
+   * 检查相邻位置是否匹配消除条件
+   * @param e BlockManager实例
+   * @param row 相邻位置的行
+   * @param col 相邻位置的列
+   * @param currentValue 当前位置的值
+   * @returns 是否匹配
+   */
+  private checkAdjacentMatch(e: BlockManager, row: number, col: number, currentValue: number): boolean {
+    const barrier = e.BlockManagerModel.barrier[row]?.[col];
+    const mapValue = e.BlockManagerModel.map[row]?.[col];
+    
+    // barrier为1 且 map不为0 且 (值相等 或 相加为10)
+    return barrier === 1 && 
+           mapValue !== 0 && 
+           (mapValue === currentValue || mapValue + currentValue === 10);
+  }
 }
