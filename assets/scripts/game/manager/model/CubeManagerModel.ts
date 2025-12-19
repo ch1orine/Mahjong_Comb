@@ -14,6 +14,8 @@ export class CubeManagerModel {
   
   public readonly OFFSET_ROW: number = 3;
 
+  public readonly MOVE_TOLERANCE: number = 40;
+
   public get map(): number[][] {
     return this._map;
   }
@@ -66,6 +68,15 @@ export class CubeManagerModel {
       return;
     }
     this._map[row][col] = value;
+  }
+
+  /** 更新格子值
+   * @param cube
+   * @param value 
+   * @returns 
+   */
+  updateMapValueByCube(cube: Cube, value: number = 0) {
+    this.updateMapValue(cube.model.row, cube.model.col, value);
   }
 
   getCube(row: number, col: number): Cube {

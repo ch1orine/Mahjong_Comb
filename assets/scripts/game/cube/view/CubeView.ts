@@ -52,11 +52,15 @@ export class CubeView extends Component {
     this._canDrag = value;
   }
 
+  public get originWorldPos(): Vec3 {
+    return this._originalWorldPos;
+  }
+
   onLoad() {
     this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
     this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
     this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-    this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this);
+    this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
     this._siblingIndex = this.node.getSiblingIndex();
   }
 
@@ -94,14 +98,13 @@ export class CubeView extends Component {
     );
     if (distToOrigin < 25 && this.isTouchInCubeBounds(touchPos)) {
       // 回到原始位置附近，重置锁定方向以允许改变运动方向
-      this._lockedDirection = null;
-      EventBus.instance.emit(CubeEvent.onCubeReturn);
+      this._lockedDirection = null;      
     }
 
     // 超过容差才开始移动
     if (dis > this._moveTolerance) {
       // 首次超过容差时，锁定移动方向
-      if (!this._lockedDirection) {
+      if (!this._lockedDirection) {       
         const deltaX = touchPos.x - startPos.x;
         const deltaY = touchPos.y - startPos.y;
         const angle = Math.abs((Math.atan2(deltaY, deltaX) * 180) / Math.PI);
@@ -128,17 +131,11 @@ export class CubeView extends Component {
       }
       // 根据锁定方向移动
       if (this._lockedDirection === "horizontal") {
-        const clampedX = math.clamp(touchPos.x, this._maxDis.left, this._maxDis.right);
-        this.node.setWorldPosition(clampedX, this._originalWorldPos.y, 0);
-        const currentWorldPos = this.node.getWorldPosition();
-        const deltaX = currentWorldPos.x - this._originalWorldPos.x;
-        EventBus.instance.emit(CubeEvent.onFollowCube, {node:this.node, isHorizontal:true, delta:deltaX});
+        const clampedX = math.clamp(touchPos.x, this._maxDis.left, this._maxDis.right);     
+        EventBus.instance.emit(CubeEvent.onFollowCube, {node:this.node, isHorizontal:true, delta:clampedX});
       } else if (this._lockedDirection === "vertical") {
         const clampedY = math.clamp(touchPos.y, this._maxDis.down, this._maxDis.up);
-        this.node.setWorldPosition(this._originalWorldPos.x, clampedY, 0);
-        const currentWorldPos = this.node.getWorldPosition();
-        const deltaY = currentWorldPos.y - this._originalWorldPos.y;
-        EventBus.instance.emit(CubeEvent.onFollowCube, {node:this.node, isHorizontal:false, delta:deltaY});
+        EventBus.instance.emit(CubeEvent.onFollowCube, {node:this.node, isHorizontal:false, delta:clampedY});
       }      
     } else {
       this._xDis = 0;
@@ -151,46 +148,47 @@ export class CubeView extends Component {
     if (!this._canDrag || !this._isDragging) {
       return;
     }
-    event.getUIStartLocation();
-    event.getUILocation();
     this._isDragging = false;
     const dis = Vec2.squaredDistance(
       event.getUIStartLocation(),
       event.getUILocation()
     );
 
-    if (dis > this._moveTolerance) {
+    const currentWorldPos = this.node.getWorldPosition();
+    const distToOrigin = Vec3.squaredDistance(
+      currentWorldPos,
+      this._originalWorldPos
+    );
+    EventBus.instance.emit(CubeEvent.onCubeDragEnd, this.node);
+    if (distToOrigin > this._moveTolerance) {
       // 触摸移动距离超过容差，视为拖动操作
-      EventBus.instance.emit(CubeEvent.onCubeDragEnd, this.node);
+      // EventBus.instance.emit(CubeEvent.onCubeDragEnd, this.node);
+
+      EventBus.instance.emit(CubeEvent.onCubeReturn, this.node);//test
       //匹配失败，回弹
-      // this.rePosAnim();
+      
+
     } else {
       this.node.setSiblingIndex(this._siblingIndex);
       EventBus.instance.emit(CubeEvent.onShakeCube, this.node);
     }
-
+    this.rePosAnim();
     // 重置状态
     this._xDis = 0;
     this._yDis = 0;
     this._lockedDirection = null;
   }
 
-  private onTouchCancel(event: EventTouch) {
-    this._isDragging = false;
-    this._lockedDirection = null;
-    this._xDis = 0;
-    this._yDis = 0;    
-    this.rePosAnim();
-  }
+  // private onTouchCancel(event: EventTouch) {
+  //   this._isDragging = false;
+  //   this._lockedDirection = null;
+  //   this._xDis = 0;
+  //   this._yDis = 0;  
+  //   this.rePosAnim(); 
+  //   EventBus.instance.emit(CubeEvent.onCubeReturn, this.node);//test     
+  // }
 
-  public rePosAnim() {
-    tween(this.node)
-      .to(0.1, { position: this._originalPosition })
-      .call(() => {
-        this.node.setSiblingIndex(this._siblingIndex);
-      })
-      .start();
-  }
+
 
   /** 检查触摸点是否在cube范围内
    * @param touchPos UI坐标系中的触摸位置
@@ -220,6 +218,17 @@ export class CubeView extends Component {
     this._originalPosition = this.node.position.clone();
     this._originalWorldPos = this.node.getWorldPosition().clone();
   }
+
+
+  public rePosAnim() {    
+    tween(this.node)
+      .to(0.1, { position: this._originalPosition })
+      .call(() => {
+        this.node.setSiblingIndex(this._siblingIndex);
+      })
+      .start();
+  }
+
 
   onDestroy() {
     this.node.off(Node.EventType.TOUCH_START, this.onTouchStart, this);

@@ -74,8 +74,8 @@ constructor() {
     this.CubeManagerBll.followCube(this, data.node, data.isHorizontal, data.delta);
   }
 
-  private onCubeDragEnd() {
-    this.CubeManagerBll.checkMovedCubes(this);
+  private onCubeDragEnd(node: Node) {
+    this.CubeManagerBll.pairCube(this, node);
   }
 
   private onCubeReturn() {

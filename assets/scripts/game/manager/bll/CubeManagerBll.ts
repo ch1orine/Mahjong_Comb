@@ -12,12 +12,15 @@ import {
 } from "cc";
 import { CubeManager } from "../CubeManager";
 import { Cube } from "../../cube/Cube";
+import { constants } from "buffer";
 const { ccclass, property } = _decorator;
 
 @ccclass("CubeManagerBll")
 export class CubeManagerBll extends Component {
-
-  private _movedCubes: Cube[] = [];
+  
+  private _hCubes: Cube[] = [];
+  
+  private _vCubes: Cube[] = [];
 
   /** 创建麻将实体
    * @param e CubeManager实例
@@ -54,18 +57,13 @@ export class CubeManagerBll extends Component {
    * @param cube 需要检查的麻将
    * @param callback 回调函数，返回可移动方向
    */
-  public checkCubeMovable(
-    e: CubeManager,
-    node: Node,
-    callback: (data: any) => void
+  public checkCubeMovable(e: CubeManager, node: Node, callback: (data: any) => void
   ) {
     const cube = node.getComponent(Cube);
     const col = cube.model.col;
-    const row = cube.model.row;
-    const val = cube.model.id;
-    const dirs = this.getMaxReachableInDirections(e, row, col);
-    // console.log("检查麻将可移动方向", dirs);
-    const res = this.getCubeReachablePos(e, row, col, dirs);
+    const row = cube.model.row;    
+    const data = this.getMaxReachableInDirections(e, row, col);        
+    const res = this.getCubeReachablePos(e, row, col, data);
     callback(res);
   }
 
@@ -75,11 +73,7 @@ export class CubeManagerBll extends Component {
    * @returns 对象，包含四个方向的信息
    *   - up/down/left/right: { distance: 能到达的最远距离（空位数量）, pushCount: 连续可推动的cube数量, reachable: 是否可达 }
    */
-  getMaxReachableInDirections(
-    e: CubeManager,
-    row: number,
-    col: number
-  ): {
+  getMaxReachableInDirections(e: CubeManager,row: number,col: number): {
     up: { distance: number; pushCount: number };
     down: { distance: number; pushCount: number };
     left: { distance: number; pushCount: number };
@@ -150,12 +144,8 @@ export class CubeManagerBll extends Component {
    * @param data 四个方向的可达信息
    * @returns 包含四个方向坐标位置的对象
    */
-  public getCubeReachablePos(
-    e: CubeManager,
-    row: number,
-    col: number,
-    data: any
-  ): { up: number; down: number; left: number; right: number } {
+  public getCubeReachablePos(e: CubeManager,row: number,col: number,data: any): 
+  { up: number; down: number; left: number; right: number } {
     return {
       up: this.convertWorldPos(
         this.getPosByRowCol(e, row - data.up.distance, col)
@@ -172,13 +162,138 @@ export class CubeManagerBll extends Component {
     };
   }
 
-  private getPosByRowCol(e: CubeManager, row: number, col: number): Vec3 {
-    return v3(
-      (col - e.CubeManagerModel.OFFSET_COL) * e.CubeManagerModel.SIZE,
-      (e.CubeManagerModel.OFFSET_ROW - row) * e.CubeManagerModel.SIZE,
-      0
-    );
+
+
+  /** 麻将跟随移动
+   * @param e CubeManager实例
+   * @param node 被移动的麻将节点
+   * @param isHorizontal 是否水平移动
+   * @param newPos 移动的坐标值（x或y）
+   */
+  public followCube(e: CubeManager, node: Node, isHorizontal: boolean, newPos: number) {    
+    const cube = node.getComponent(Cube);
+    const col = cube.model.col;
+    const row = cube.model.row;
+    // const val = cube.model.id;
+    const res = this.getMaxReachableInDirections(e, row, col);        
+    if (isHorizontal) {
+      this._vCubes.forEach(cube => {
+        cube.rePosAnim();
+      });
+      this._vCubes = [];
+      this._hCubes = [];
+      node.setWorldPosition(newPos, cube.view.originWorldPos.y, 0);
+      if (newPos - cube.view.originWorldPos.x > 0) {
+        // 向右移动        
+        for (let i = 0; i < res.right.pushCount; i++) {
+          const movedCube = e.CubeManagerModel.getCube(row, col + i + 1);
+          this._hCubes.push(movedCube);
+          console.log("向右移动", movedCube.name);
+          movedCube.node.setWorldPosition(
+            newPos + e.CubeManagerModel.SIZE * (i + 1), movedCube.node.getWorldPosition().y,0);            
+          }               
+      } else {
+        // 向左移动
+        for (let i = 0; i < res.left.pushCount; i++) {
+          const movedCube = e.CubeManagerModel.getCube(row, col - i - 1);
+          console.log("向左移动", movedCube.name);
+          this._hCubes.push(movedCube);
+          console.log("向左移动", movedCube.name);
+          movedCube.node.setWorldPosition(newPos - e.CubeManagerModel.SIZE * (i + 1), movedCube.node.getWorldPosition().y,0);            
+        }                
+      }
+    } 
+    else {
+      this._hCubes.forEach(cube => {
+        cube.rePosAnim();
+      });
+      this._hCubes = [];
+      this._vCubes = [];
+      node.setWorldPosition(cube.view.originWorldPos.x, newPos, 0);
+      if (newPos - cube.view.originWorldPos.y > 0) {
+        // 向上移动
+        for (let i = 0; i < res.up.pushCount; i++) {
+          const movedCube = e.CubeManagerModel.getCube(row - i - 1, col);
+          this._vCubes.push(movedCube);
+          movedCube.node.setWorldPosition( movedCube.node.getWorldPosition().x, newPos + e.CubeManagerModel.SIZE * (i + 1),0);
+        }                  
+      } else {
+        // 向下移动
+        for (let i = 0; i < res.down.pushCount; i++) {
+          const movedCube = e.CubeManagerModel.getCube(row + i + 1, col);
+          this._vCubes.push(movedCube);
+          movedCube.node.setWorldPosition( movedCube.node.getWorldPosition().x, newPos - e.CubeManagerModel.SIZE * (i + 1),0);            
+        }                
+      }
+    }
+    
   }
+
+  /** 配对麻将
+   * @param e CubeManager实例
+   * @param node 被移动的麻将节点
+   */
+  public pairCube(e: CubeManager, node: Node) {
+    const cube = node.getComponent(Cube);
+    const h = cube.view.originWorldPos.y == node.getWorldPosition().y;
+    const bclick = Vec3.squaredDistance(cube.view.originWorldPos, node.getWorldPosition()) < e.CubeManagerModel.MOVE_TOLERANCE;
+    const row = Math.round(e.CubeManagerModel.OFFSET_ROW - node.getPosition().y / e.CubeManagerModel.SIZE);
+    const col = Math.round(node.getPosition().x / e.CubeManagerModel.SIZE + e.CubeManagerModel.OFFSET_COL);
+    const val = cube.model.id;
+    const res = this.getReachablePos(e, row, col);
+    if (!bclick){
+      if (h) {          
+          if (e.CubeManagerModel.getMapValue(row - res.up, col) === val ){
+              console.log("配对成功-水平");
+              node.active = false;
+              e.CubeManagerModel.getCube(row - res.up, col).node.active = false;
+              e.CubeManagerModel.updateMapValueByCube(cube);
+              e.CubeManagerModel.updateMapValue(row - res.up, col);              
+          } 
+           else if (e.CubeManagerModel.getMapValue(row + res.down, col) === val) {
+              console.log("配对成功-水平");
+              node.active = false;
+              e.CubeManagerModel.getCube(row + res.down, col).node.active = false;
+              e.CubeManagerModel.updateMapValueByCube(cube);
+              e.CubeManagerModel.updateMapValue(row + res.down, col);
+          }
+      }
+      else{
+          if (e.CubeManagerModel.getMapValue(row, col - res.left) === val){
+              console.log("配对成功-垂直");
+              node.active = false;
+              e.CubeManagerModel.getCube(row, col - res.left).node.active = false;
+              e.CubeManagerModel.updateMapValueByCube(cube);
+              e.CubeManagerModel.updateMapValue(row, col - res.left);
+          } 
+          else if (e.CubeManagerModel.getMapValue(row, col + res.right) === val) {
+              console.log("配对成功-垂直");
+              node.active = false;
+              e.CubeManagerModel.updateMapValueByCube(cube);
+              e.CubeManagerModel.getCube(row, col + res.right).node.active = false;
+              e.CubeManagerModel.updateMapValue(row, col + res.right);              
+          }
+      }
+    }else{
+      // console.log("点击，无配对");
+    }         
+  }
+
+  
+  public returnOrigin() {
+    this._hCubes.forEach(cube => {
+      cube.rePosAnim();
+    });
+    this._vCubes.forEach(cube => {
+      cube.rePosAnim();
+    });
+    this._hCubes = [];
+    this._vCubes = [];    
+  }
+
+
+
+
 
   // 将以屏幕中心为原点的坐标转换为以屏幕左下角为原点的坐标
   private convertWorldPos(pos: Vec3): Vec3 {
@@ -186,51 +301,41 @@ export class CubeManagerBll extends Component {
     return v3(pos.x + size.width / 2, pos.y + size.height / 2, pos.z);
   }
 
-  public followCube(e: CubeManager, node: Cube, isHorizontal: boolean, delta: number) {
-    const cube = node.getComponent(Cube);
-    const col = cube.model.col;
-    const row = cube.model.row;
-    // const val = cube.model.id;
-    const res = this.getMaxReachableInDirections(e, row, col);
-    if (isHorizontal) {
-      if (delta > 0) {
-        // 向右移动
-        for (let i = 0; i < res.right.pushCount; i++) {
-          e.CubeManagerModel.getCube(row, col + i + 1).node.setWorldPosition(
-            e.CubeManagerModel.getCube(row, col).node.getWorldPosition().x + e.CubeManagerModel.SIZE * (i + 1),e.CubeManagerModel.getCube(row, col).node.getWorldPosition().y,0);
-            // e.CubeManagerModel.getCube(row, col+i+1).node.setParent(node);
-        }        
-      } else {
-        // 向左移动
-        for (let i = 0; i < res.left.pushCount; i++) {
-          e.CubeManagerModel.getCube(row, col - i - 1).node.setWorldPosition( e.CubeManagerModel.getCube(row, col).node.getWorldPosition().x - e.CubeManagerModel.SIZE * (i + 1),e.CubeManagerModel.getCube(row, col).node.getWorldPosition().y,0);
-            // e.CubeManagerModel.getCube(row, col-i-1).node.setParent(node);
-        }        
-      }
-    }else{
-      if (delta > 0) {
-        // 向上移动
-        for (let i = 0; i < res.up.pushCount; i++) {
-          e.CubeManagerModel.getCube(row - i - 1, col).node.setWorldPosition( e.CubeManagerModel.getCube(row, col).node.getWorldPosition().x,e.CubeManagerModel.getCube(row, col).node.getWorldPosition().y + e.CubeManagerModel.SIZE * (i + 1),0);
-            // e.CubeManagerModel.getCube(row-i-1, col).node.setParent(node);
-        }        
-      } else {
-        // 向下移动 // 向左移动
-        for (let i = 0; i < res.down.pushCount; i++) {
-          e.CubeManagerModel.getCube(row + i + 1, col).node.setWorldPosition( e.CubeManagerModel.getCube(row, col).node.getWorldPosition().x,e.CubeManagerModel.getCube(row, col).node.getWorldPosition().y - e.CubeManagerModel.SIZE * (i + 1),0);
-            // e.CubeManagerModel.getCube(row+i+1, col).node.setParent(node);
-        }        
-      }
-    }
+
+  private getReachablePos(e: CubeManager, row: number, col: number): any {
+    const calculateDirection = (rowDelta: number, colDelta: number) => {
+      let distance = 1;
+      let currentRow = row + rowDelta;
+      let currentCol = col + colDelta;
+     while (true) {
+        const value = e.CubeManagerModel.getMapValue(currentRow, currentCol);
+        if (value === -1) {
+          // 越界
+          return -1;
+        }
+        if(value !== 0) {
+          // 非空位
+          break;
+        }
+        distance++;
+        currentRow += rowDelta;
+        currentCol += colDelta;
+     }
+     return distance;
+  };
+  return {
+      up: calculateDirection(-1, 0),
+      down: calculateDirection(1, 0),
+      left: calculateDirection(0, -1),
+      right: calculateDirection(0, 1),
+    };
   }
 
-
-  public checkMovedCubes(e: CubeManager) {
-    
+  private getPosByRowCol(e: CubeManager, row: number, col: number): Vec3 {
+   return v3(
+      (col - e.CubeManagerModel.OFFSET_COL) * e.CubeManagerModel.SIZE,
+      (e.CubeManagerModel.OFFSET_ROW - row) * e.CubeManagerModel.SIZE,
+      0
+    );
   }
-
-  public returnOrigin(){
-    
-  }
-
 }
