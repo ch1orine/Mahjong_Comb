@@ -12,6 +12,8 @@ import {
 } from "cc";
 import { CubeManager } from "../CubeManager";
 import { Cube } from "../../cube/Cube";
+import { EventBus } from "../../../event/EventBus";
+import { EffectEvent } from "../../../effect/EffectEvent";
 const { ccclass, property } = _decorator;
 
 @ccclass("CubeManagerBll")
@@ -275,18 +277,28 @@ export class CubeManagerBll extends Component {
     //滑动配对
     if (!bclick) {
       if (h) {          
-          if (e.CubeManagerModel.getMapValue(row - res.up, col) === val ){              
-
-              // node.active = false;
-              // e.CubeManagerModel.getCube(row - res.up, col).node.active = false;
+          if (e.CubeManagerModel.getMapValue(row - res.up, col) === val ){   
+              cube.activeMask(true);                         
+              e.CubeManagerModel.getCube(row - res.up, col).activeMask(true);
               node.setPosition(newPos);
               e.CubeManagerModel.removeCube(cube);
-              console.log("配了")
+
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row - res.up, col));
 
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row - res.up, col);
               
+              // EventBus.instance.emit(EffectEvent.Line, {start: startP, endP:  Vec3.ZERO});
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row - res.up, col);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row - res.up, col).destroyAnim();
+              // }
+
               this._hLCubes.forEach(cube => {
                   this.cubeupdate(e, cube, 0, colDelta);
                   this.pairCube(e, cube.node);
@@ -297,8 +309,9 @@ export class CubeManagerBll extends Component {
                 });
                            
           } 
-          else if (e.CubeManagerModel.getMapValue(row + res.down, col) === val) {              
-
+          else if (e.CubeManagerModel.getMapValue(row + res.down, col) === val) {  
+              cube.activeMask(true);            
+              e.CubeManagerModel.getCube(row + res.down, col).activeMask(true);
               // node.active = false;
               // e.CubeManagerModel.getCube(row + res.down, col).node.active = false;
               node.setPosition(newPos);
@@ -308,7 +321,16 @@ export class CubeManagerBll extends Component {
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row + res.down, col);
 
-              
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row + res.down, col);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row + res.down, col).destroyAnim();
+              // }
+
               this._hLCubes.forEach(cube => {
                   this.cubeupdate(e, cube, 0, colDelta);
                   this.pairCube(e, cube.node);
@@ -321,20 +343,32 @@ export class CubeManagerBll extends Component {
           }
           else{
             cube.rePosAnim();
+            cube.activeMask(false);
           }
       }
       else{
-          if (e.CubeManagerModel.getMapValue(row, col - res.left) === val){              
+          if (e.CubeManagerModel.getMapValue(row, col - res.left) === val){            
+            cube.activeMask(true);           
+            e.CubeManagerModel.getCube(row, col - res.left).activeMask(true); 
               // node.active = false;
               // e.CubeManagerModel.getCube(row, col - res.left).node.active = false;
               node.setPosition(newPos);
               e.CubeManagerModel.removeCube(cube);
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row, col - res.left));
-
+              
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row, col - res.left);
 
-              
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row, col - res.left);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row, col - res.left).destroyAnim();
+              // }
+
               this._vUCubes.forEach(cube => {
                   this.cubeupdate(e, cube, rowDelta, 0);
                   this.pairCube(e, cube.node);
@@ -345,7 +379,9 @@ export class CubeManagerBll extends Component {
                 })
               
           } 
-          else if (e.CubeManagerModel.getMapValue(row, col + res.right) === val) {              
+          else if (e.CubeManagerModel.getMapValue(row, col + res.right) === val) {   
+              cube.activeMask(true);           
+              e.CubeManagerModel.getCube(row, col + res.right).activeMask(true);            
               // node.active = false;
               // e.CubeManagerModel.getCube(row, col + res.right).node.active = false;
               node.setPosition(newPos); 
@@ -354,8 +390,17 @@ export class CubeManagerBll extends Component {
 
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row, col + res.right);  
-
               
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row, col + res.right);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row, col + res.right).destroyAnim();
+              // }
+
               this._vUCubes.forEach(cube => {
                   this.cubeupdate(e, cube, rowDelta, 0);
                   this.pairCube(e, cube.node);
@@ -367,53 +412,93 @@ export class CubeManagerBll extends Component {
           }
           else{
             cube.rePosAnim();
+            cube.activeMask(false);
           }
       }
     } else {
       // console.log("点击，直接配对");
-      if (e.CubeManagerModel.getMapValue(row - res.up, col) === val ){ 
+      if (e.CubeManagerModel.getMapValue(row - res.up, col) === val ){
+              cube.activeMask(true); 
+              e.CubeManagerModel.getCube(row - res.up, col).activeMask(true);
 
-              // node.active = false;
-              // e.CubeManagerModel.getCube(row - res.up, col).node.active = false;
-              
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row - res.up, col);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
               e.CubeManagerModel.removeCube(cube);
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row - res.up, col));
 
               e.CubeManagerModel.updateMapValueByCube(cube);
-              e.CubeManagerModel.updateMapValue(row - res.up, col);              
+              e.CubeManagerModel.updateMapValue(row - res.up, col);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row - res.up, col).destroyAnim();
+              // }                            
       } 
       else if (e.CubeManagerModel.getMapValue(row + res.down, col) === val) {
-              
-              // node.active = false;
-              // e.CubeManagerModel.getCube(row + res.down, col).node.active = false;
+              cube.activeMask(true);
+              e.CubeManagerModel.getCube(row + res.down, col).activeMask(true);
+
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row + res.down, col);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
               node.setPosition(newPos);
               e.CubeManagerModel.removeCube(cube);
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row + res.down, col));
 
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row + res.down, col);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row + res.down, col).destroyAnim();
+              // }                            
       }
       else if (e.CubeManagerModel.getMapValue(row, col - res.left) === val){
-              
-              // node.active = false;
-              // e.CubeManagerModel.getCube(row, col - res.left).node.active = false;
-              // node.setPosition(newPos);
+              cube.activeMask(true);
+              e.CubeManagerModel.getCube(row, col - res.left).activeMask(true);
+
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row, col - res.left).destroyAnim();
+              // }  
+
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row, col - res.left);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
               e.CubeManagerModel.removeCube(cube);
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row, col - res.left));
               
               e.CubeManagerModel.updateMapValueByCube(cube);
-              e.CubeManagerModel.updateMapValue(row, col - res.left);
+              e.CubeManagerModel.updateMapValue(row, col - res.left); 
+
+                         
       } 
       else if (e.CubeManagerModel.getMapValue(row, col + res.right) === val) {
-              
-              // node.active = false;
-              // e.CubeManagerModel.getCube(row, col + res.right).node.active = false;
-              // node.setPosition(newPos);
+              cube.activeMask(true);
+              e.CubeManagerModel.getCube(row, col + res.right).activeMask(true);
+
+              const startP = this.getWorldPosByRowCol(e, row, col);
+              const endP = this.getWorldPosByRowCol(e, row, col + res.right);
+              EventBus.instance.emit(EffectEvent.Line, startP, endP);
+
               e.CubeManagerModel.removeCube(cube);
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row, col + res.right));
               
               e.CubeManagerModel.updateMapValueByCube(cube);
-              e.CubeManagerModel.updateMapValue(row, col + res.right);              
+              e.CubeManagerModel.updateMapValue(row, col + res.right);  
+              
+              // if(e.CubeManagerModel.checkIsBar(val)){}
+              // else{
+              //   cube.destroyAnim();
+              //   e.CubeManagerModel.getCube(row, col + res.right).destroyAnim();
+              // }
       }
     }        
   }
@@ -491,6 +576,14 @@ export class CubeManagerBll extends Component {
     );
   }
 
+  private getWorldPosByRowCol(e: CubeManager, row: number, col: number): Vec3 {
+    const pos = v3(
+      (col - e.CubeManagerModel.OFFSET_COL) * e.CubeManagerModel.SIZE,
+      (e.CubeManagerModel.OFFSET_ROW - row) * e.CubeManagerModel.SIZE,
+      0
+    );
+    return this.convertWorldPos(pos);
+  }
 
   private onPairSuccess(pos: Vec3) {
     // console.log("配对成功");

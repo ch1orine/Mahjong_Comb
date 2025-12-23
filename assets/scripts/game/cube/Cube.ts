@@ -1,4 +1,4 @@
-import { _decorator, Component, math, Node, resources, SpriteFrame, tween, v3, Vec3 } from 'cc';
+import { _decorator, Component, math, Node, resources, SpriteFrame, tween, v3, Vec3, find, view } from 'cc';
 import { CubeModel } from './model/CubeModel';
 import { CubeView } from './view/CubeView';
 import { CubeBll } from './bll/CubeBll';
@@ -83,6 +83,59 @@ export class Cube extends Component {
         this.view.mask.node.active = active;
     }
 
-    /** 消除动画 */
+    /** 飞出动画 */
+    flyAnim(){        
+        const target = find(`gui/game/Bar/Layout/${this.model.id}`);                
+        const start = this.node.getPosition().clone();
+        const posW = this.node.getWorldPosition().clone();
+        const pos = target.getWorldPosition();
+        pos.add(v3(-view.getVisibleSize().width / 2, -view.getVisibleSize().height / 2,0));
+        
+        console.log(posW);
+        // 根据start坐标计算延迟差值，y坐标越小延迟越长
+        const delayOffset = 100 / posW.y // + posW.x / 6000;
+        const totalDelay = 0.25 + delayOffset;
+        
+        // const control = v3(500, 600, 0);
+        const control = this.bll.controlPoint(start, pos, 0,400, 200);
+
+        tween(this.node)
+        .to(0.25, {scale: v3(1.15, 1.15, 1)})      
+        .call(()=>{
+            this.activeMask(false);
+        })
+        .start();    
+
+        tween({t:0})
+        .delay(totalDelay)
+        .to(0.5 + delayOffset, {t: 1}, {
+            easing:'quadInOut', 
+            onUpdate:(v)=>{
+                const target = this.bll.bezier(start, control, pos, v.t)
+                this.node.setPosition(target);
+                if(v.t >= 0.8){
+                    // this.node.setScale(v3(1.15 - 0.33 * v.t, 1.15 - 0.33 * v.t, 1));
+                    tween(this.node)
+                    .to(0.2, {scale: v3(0.833, 0.833, 1)})
+                    .start();
+                }
+            }
+        })
+        .call(()=>{
+            // this.node.setScale(v3(0.833, 0.833, 1));
+        })
+        .start();
+    }
+
+    /** 销毁动画 */
+    destroyAnim(){
+        tween(this.node)    
+        .to(0.2, {scale: v3(1.15, 1.15, 1)})        
+        .call(()=>{
+            this.node.removeFromParent();            
+            this.node.destroy();  
+        })
+        .start();
+    }
 }
 

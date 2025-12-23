@@ -1,5 +1,4 @@
-import { _decorator, Camera, Color, Component, instantiate, Label, Prefab, resources } from "cc";
-import { BlockManager } from "./game/manager/BlockManager";
+import { _decorator, Camera, Color, Component, instantiate, Prefab, resources } from "cc";
 import { gameConfig } from "./common/GameConfig";
 import { Sound } from "./sound/Sound";
 import super_html_playable from "./common/super_html_playable";
@@ -8,6 +7,7 @@ import { GuideManager } from "./game/guide/GuideManager";
 import { GuideEvent } from "./game/guide/GuideEven";
 import * as i18n from 'db://i18n/LanguageData';
 import { CubeManager } from "./game/manager/CubeManager";
+import { EffectManager } from "./effect/EffectManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("Main")
@@ -61,6 +61,8 @@ export class Main extends Component {
       });
       const manager = new CubeManager();
       manager.init();
+      const effect = new EffectManager();
+      
       const guide = new GuideManager();
       // guide.init();
     });

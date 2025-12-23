@@ -65,6 +65,7 @@ constructor() {
     const id = cube?.model.id || 0;
     const cubes = this.CubeManagerModel.getCubesById(id);
     cubes.forEach((cube)=>{
+      cube.activeMask(false);
       cube.shakeAnim();
     });
   }

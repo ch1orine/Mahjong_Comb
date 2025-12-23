@@ -8,6 +8,8 @@ export class CubeManagerModel {
 
   private _map: number[][];
 
+  private _barMap:number[] = [47, 51, 45, 39, 21];
+
   public readonly SIZE: number = 118;
 
   public readonly OFFSET_COL: number = 2.5;
@@ -15,6 +17,7 @@ export class CubeManagerModel {
   public readonly OFFSET_ROW: number = 3.4;
 
   public readonly MOVE_TOLERANCE: number = 40;
+
 
   public get map(): number[][] {
     return this._map;
@@ -92,7 +95,18 @@ export class CubeManagerModel {
     if (index > -1) {
       this.cubes.splice(index, 1);
     }
-    // cube.node.active = false;
+    if(this.checkIsBar(cube.model.id)) {
+      console.log("remove bar cube");
+      cube.flyAnim();
+    }
+    else {      
+      cube.destroyAnim();
+    }
   }
 
+  checkIsBar(val: number): boolean {
+    return this._barMap.includes(val);
+  }  
+
+  
 }

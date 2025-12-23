@@ -161,8 +161,8 @@ export class CubeView extends Component {
       event.getUILocation()
     );
 
-    this.mask.node.active = false;
-    
+    // this.mask.node.active = false;
+
     const currentWorldPos = this.node.getWorldPosition();
     const distToOrigin = Vec3.squaredDistance(
       currentWorldPos,
@@ -179,6 +179,7 @@ export class CubeView extends Component {
 
     } else {
       this.node.setSiblingIndex(this._siblingIndex);
+      // this.mask.node.active = false;
       EventBus.instance.emit(CubeEvent.onShakeCube, this.node);
     }
     // this.rePosAnim();

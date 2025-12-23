@@ -1,0 +1,251 @@
+
+skeleton.png
+size: 788,725
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+shuye_00221
+  rotate: false
+  xy: 604, 315
+  size: 20, 23
+  orig: 720, 1280
+  offset: 340, 816
+  index: -1
+shuye_00222
+  rotate: false
+  xy: 445, 373
+  size: 32, 32
+  orig: 720, 1280
+  offset: 336, 811
+  index: -1
+shuye_00223
+  rotate: false
+  xy: 736, 255
+  size: 45, 43
+  orig: 720, 1280
+  offset: 330, 805
+  index: -1
+shuye_00224
+  rotate: false
+  xy: 243, 24
+  size: 59, 53
+  orig: 720, 1280
+  offset: 323, 800
+  index: -1
+shuye_00225
+  rotate: false
+  xy: 717, 13
+  size: 69, 70
+  orig: 720, 1280
+  offset: 316, 794
+  index: -1
+shuye_00226
+  rotate: true
+  xy: 157, 4
+  size: 78, 84
+  orig: 720, 1280
+  offset: 309, 790
+  index: -1
+shuye_00227
+  rotate: true
+  xy: 637, 85
+  size: 84, 97
+  orig: 720, 1280
+  offset: 304, 785
+  index: -1
+shuye_00228
+  rotate: false
+  xy: 475, 7
+  size: 87, 108
+  orig: 720, 1280
+  offset: 300, 780
+  index: -1
+shuye_00229
+  rotate: true
+  xy: 354, 9
+  size: 91, 119
+  orig: 720, 1280
+  offset: 297, 775
+  index: -1
+shuye_00230
+  rotate: false
+  xy: 637, 171
+  size: 97, 127
+  orig: 720, 1280
+  offset: 295, 771
+  index: -1
+shuye_00231
+  rotate: true
+  xy: 652, 623
+  size: 100, 134
+  orig: 720, 1280
+  offset: 294, 767
+  index: -1
+shuye_00232
+  rotate: false
+  xy: 467, 117
+  size: 106, 141
+  orig: 720, 1280
+  offset: 293, 762
+  index: -1
+shuye_00233
+  rotate: false
+  xy: 354, 102
+  size: 111, 146
+  orig: 720, 1280
+  offset: 293, 759
+  index: -1
+shuye_00234
+  rotate: false
+  xy: 157, 84
+  size: 119, 151
+  orig: 720, 1280
+  offset: 289, 755
+  index: -1
+shuye_00235
+  rotate: false
+  xy: 317, 250
+  size: 126, 155
+  orig: 720, 1280
+  offset: 286, 751
+  index: -1
+shuye_00236
+  rotate: false
+  xy: 652, 463
+  size: 132, 158
+  orig: 720, 1280
+  offset: 283, 748
+  index: -1
+shuye_00237
+  rotate: false
+  xy: 648, 300
+  size: 138, 161
+  orig: 720, 1280
+  offset: 280, 745
+  index: -1
+shuye_00238
+  rotate: true
+  xy: 483, 430
+  size: 143, 163
+  orig: 720, 1280
+  offset: 277, 742
+  index: -1
+shuye_00239
+  rotate: true
+  xy: 483, 575
+  size: 148, 167
+  orig: 720, 1280
+  offset: 274, 739
+  index: -1
+shuye_00240
+  rotate: false
+  xy: 2, 211
+  size: 152, 169
+  orig: 720, 1280
+  offset: 271, 737
+  index: -1
+shuye_00241
+  rotate: false
+  xy: 2, 382
+  size: 155, 170
+  orig: 720, 1280
+  offset: 269, 735
+  index: -1
+shuye_00242
+  rotate: false
+  xy: 2, 554
+  size: 158, 169
+  orig: 720, 1280
+  offset: 266, 734
+  index: -1
+shuye_00243
+  rotate: false
+  xy: 162, 557
+  size: 159, 166
+  orig: 720, 1280
+  offset: 264, 734
+  index: -1
+shuye_00244
+  rotate: false
+  xy: 323, 558
+  size: 158, 165
+  orig: 720, 1280
+  offset: 263, 733
+  index: -1
+shuye_00245
+  rotate: false
+  xy: 159, 395
+  size: 156, 157
+  orig: 720, 1280
+  offset: 262, 734
+  index: -1
+shuye_00246
+  rotate: false
+  xy: 159, 237
+  size: 156, 156
+  orig: 720, 1280
+  offset: 261, 735
+  index: -1
+shuye_00247
+  rotate: true
+  xy: 2, 51
+  size: 158, 153
+  orig: 720, 1280
+  offset: 260, 736
+  index: -1
+shuye_00248
+  rotate: false
+  xy: 323, 407
+  size: 158, 149
+  orig: 720, 1280
+  offset: 260, 737
+  index: -1
+shuye_00249
+  rotate: false
+  xy: 483, 340
+  size: 158, 88
+  orig: 720, 1280
+  offset: 261, 785
+  index: -1
+shuye_00250
+  rotate: false
+  xy: 445, 260
+  size: 157, 78
+  orig: 720, 1280
+  offset: 262, 786
+  index: -1
+shuye_00251
+  rotate: true
+  xy: 278, 79
+  size: 156, 74
+  orig: 720, 1280
+  offset: 262, 788
+  index: -1
+shuye_00252
+  rotate: true
+  xy: 575, 104
+  size: 154, 60
+  orig: 720, 1280
+  offset: 263, 801
+  index: -1
+shuye_00253
+  rotate: false
+  xy: 564, 31
+  size: 151, 52
+  orig: 720, 1280
+  offset: 265, 804
+  index: -1
+shuye_00254
+  rotate: false
+  xy: 2, 2
+  size: 147, 47
+  orig: 720, 1280
+  offset: 268, 806
+  index: -1
+shuye_00255
+  rotate: true
+  xy: 467, 108
+  size: 7, 6
+  orig: 720, 1280
+  offset: 270, 844
+  index: -1
