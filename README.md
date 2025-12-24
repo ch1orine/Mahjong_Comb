@@ -1,3 +1,7 @@
-# Sum_Ten
-# DailyMahjong
-# DailyMahjong
+#Mahjong_Fly
+这是一个基于cocos3x 3.8.6的麻将游戏，目前实现了麻将的出牌和碰牌功能，后续会继续完善。
+
+
+#Todo
+-麻将MVC架构，解耦代码，使其更加模块化
+

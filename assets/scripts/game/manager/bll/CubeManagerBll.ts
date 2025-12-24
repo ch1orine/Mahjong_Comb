@@ -441,9 +441,7 @@ export class CubeManagerBll extends Component {
 
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row - res.up, col);
-              if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
-                Sound.ins.playOneShot(Sound.effect.line);                       
-              } 
+     
       } 
       else if (e.CubeManagerModel.getMapValue(row + res.down, col) === val) {
               cube.activeMask(true);
@@ -458,9 +456,7 @@ export class CubeManagerBll extends Component {
 
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row + res.down, col);
-               if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
-                Sound.ins.playOneShot(Sound.effect.line);                       
-              }  
+      
       }
       else if (e.CubeManagerModel.getMapValue(row, col - res.left) === val){
               cube.activeMask(true);
@@ -476,9 +472,7 @@ export class CubeManagerBll extends Component {
               
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row, col - res.left); 
-               if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
-                Sound.ins.playOneShot(Sound.effect.line);                       
-              }                          
+                        
       } 
       else if (e.CubeManagerModel.getMapValue(row, col + res.right) === val) {
               cube.activeMask(true);
@@ -494,9 +488,7 @@ export class CubeManagerBll extends Component {
               
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row, col + res.right);
-               if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
-                Sound.ins.playOneShot(Sound.effect.line);                       
-              }               
+            
       }else{
         EventBus.instance.emit(CubeEvent.onShakeCube, cube.node); 
       }

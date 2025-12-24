@@ -3,6 +3,7 @@ import { Cube } from "../../cube/Cube";
 import { EventBus } from "../../../event/EventBus";
 import { CubeEvent } from "../../cube/CubeEvent";
 import { JumpEvent } from "../../jump/JumpEvent";
+import { Sound } from "../../../sound/Sound";
 const { ccclass } = _decorator;
 
 @ccclass("CubeManagerModel")
@@ -103,6 +104,7 @@ export class CubeManagerModel {
     }
     else {      
       cube.destroyAnim();
+      Sound.ins.playOneShot(Sound.effect.line);
     }
     
     if (cube.node.name === "cube_16") {
