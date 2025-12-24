@@ -6,6 +6,7 @@ import { CubeManagerEvent } from "./CubeManagerEvent";
 import { CubeManagerModel } from "./model/CubeManagerModel";
 import { CubeEvent } from "../cube/CubeEvent";
 import { Cube } from "../cube/Cube";
+import { Sound } from "../../sound/Sound";
 const { ccclass, property } = _decorator;
 
 @ccclass("CubeManager")
@@ -62,6 +63,7 @@ constructor() {
   }
 
   private onShakeCubes(node:Node) {
+    // Sound.ins.playOneShot(Sound.effect.shake);  
     const cube = node.getComponent(Cube);
     const id = cube?.model.id || 0;
     const cubes = this.CubeManagerModel.getCubesById(id);

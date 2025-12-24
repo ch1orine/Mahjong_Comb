@@ -14,6 +14,8 @@ import { CubeManager } from "../CubeManager";
 import { Cube } from "../../cube/Cube";
 import { EventBus } from "../../../event/EventBus";
 import { EffectEvent } from "../../../effect/EffectEvent";
+import { Sound } from "../../../sound/Sound";
+import { CubeEvent } from "../../cube/CubeEvent";
 const { ccclass, property } = _decorator;
 
 @ccclass("CubeManagerBll")
@@ -299,7 +301,7 @@ export class CubeManagerBll extends Component {
               const startP = this.getWorldPosByRowCol(e, row, col);
               const endP = this.getWorldPosByRowCol(e, row - res.up, col);
               EventBus.instance.emit(EffectEvent.Line, startP, endP);
-
+              Sound.ins.playOneShot(Sound.effect.pair); 
               // if(e.CubeManagerModel.checkIsBar(val)){}
               // else{
               //   cube.destroyAnim();
@@ -331,7 +333,7 @@ export class CubeManagerBll extends Component {
               const startP = this.getWorldPosByRowCol(e, row, col);
               const endP = this.getWorldPosByRowCol(e, row + res.down, col);
               EventBus.instance.emit(EffectEvent.Line, startP, endP);
-
+              Sound.ins.playOneShot(Sound.effect.pair); 
               // if(e.CubeManagerModel.checkIsBar(val)){}
               // else{
               //   cube.destroyAnim();
@@ -372,7 +374,7 @@ export class CubeManagerBll extends Component {
               const startP = this.getWorldPosByRowCol(e, row, col);
               const endP = this.getWorldPosByRowCol(e, row, col - res.left);
               EventBus.instance.emit(EffectEvent.Line, startP, endP);
-
+              Sound.ins.playOneShot(Sound.effect.pair); 
               // if(e.CubeManagerModel.checkIsBar(val)){}
               // else{
               //   cube.destroyAnim();
@@ -404,7 +406,7 @@ export class CubeManagerBll extends Component {
               const startP = this.getWorldPosByRowCol(e, row, col);
               const endP = this.getWorldPosByRowCol(e, row, col + res.right);
               EventBus.instance.emit(EffectEvent.Line, startP, endP);
-
+              Sound.ins.playOneShot(Sound.effect.pair); 
               this._vUCubes.forEach(cube => {
                   this.cubeupdate(e, cube, rowDelta, 0);
                   this.pairCube(e, cube.node,true);
@@ -438,7 +440,10 @@ export class CubeManagerBll extends Component {
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row - res.up, col));
 
               e.CubeManagerModel.updateMapValueByCube(cube);
-              e.CubeManagerModel.updateMapValue(row - res.up, col);                       
+              e.CubeManagerModel.updateMapValue(row - res.up, col);
+              if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
+                Sound.ins.playOneShot(Sound.effect.line);                       
+              } 
       } 
       else if (e.CubeManagerModel.getMapValue(row + res.down, col) === val) {
               cube.activeMask(true);
@@ -453,7 +458,9 @@ export class CubeManagerBll extends Component {
 
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row + res.down, col);
-                   
+               if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
+                Sound.ins.playOneShot(Sound.effect.line);                       
+              }  
       }
       else if (e.CubeManagerModel.getMapValue(row, col - res.left) === val){
               cube.activeMask(true);
@@ -469,8 +476,9 @@ export class CubeManagerBll extends Component {
               
               e.CubeManagerModel.updateMapValueByCube(cube);
               e.CubeManagerModel.updateMapValue(row, col - res.left); 
-
-                         
+               if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
+                Sound.ins.playOneShot(Sound.effect.line);                       
+              }                          
       } 
       else if (e.CubeManagerModel.getMapValue(row, col + res.right) === val) {
               cube.activeMask(true);
@@ -485,7 +493,12 @@ export class CubeManagerBll extends Component {
               e.CubeManagerModel.removeCube(e.CubeManagerModel.getCube(row, col + res.right));
               
               e.CubeManagerModel.updateMapValueByCube(cube);
-              e.CubeManagerModel.updateMapValue(row, col + res.right);              
+              e.CubeManagerModel.updateMapValue(row, col + res.right);
+               if (cube.node.name !== "cube_17" && cube.node.name !== "cube_18"){
+                Sound.ins.playOneShot(Sound.effect.line);                       
+              }               
+      }else{
+        EventBus.instance.emit(CubeEvent.onShakeCube, cube.node); 
       }
     }        
   }

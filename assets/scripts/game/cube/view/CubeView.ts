@@ -13,6 +13,7 @@ import {
 import { EventBus } from "../../../event/EventBus";
 import { CubeEvent } from "../CubeEvent";
 import { GuideEvent } from "../../guide/GuideEven";
+import { Sound } from "../../../sound/Sound";
 const { ccclass, property } = _decorator;
 
 @ccclass("CubeView")
@@ -47,6 +48,8 @@ export class CubeView extends Component {
 
   private _maxDis: any; //允许的最大偏移距离
 
+  private _slideMusic:boolean = false; //是否正在播放滑动音效
+
   public get candrag(): boolean {
     return this._canDrag;
   }
@@ -79,6 +82,9 @@ export class CubeView extends Component {
     this._lockedDirection = null; // 重置锁定方向
     this._xDis = 0;
     this._yDis = 0;
+
+    Sound.ins.playOneShot(Sound.effect.click);
+
     EventBus.instance.emit(EventBus.StopTimer);
     EventBus.instance.emit(GuideEvent.StopShowGuide);
     EventBus.instance.emit(CubeEvent.onCubeClick, this, (data: any) => {
@@ -112,6 +118,10 @@ export class CubeView extends Component {
 
     // 超过容差才开始移动
     if (dis > this._moveTolerance) {
+      if (!this._slideMusic) {
+        // Sound.ins.playOneShot(Sound.effect.slide);
+        this._slideMusic = true;
+      }
       // 首次超过容差时，锁定移动方向
       if (!this._lockedDirection) {       
         const deltaX = touchPos.x - startPos.x;
@@ -136,6 +146,9 @@ export class CubeView extends Component {
           //模糊区域，使用距离比较
           this._lockedDirection =
             this._xDis >= this._yDis ? "horizontal" : "vertical";
+        }
+        if (this.node.name === "cube_16" ) {
+          this._lockedDirection = "horizontal";
         }
       }
       // 根据锁定方向移动
@@ -162,8 +175,8 @@ export class CubeView extends Component {
       event.getUIStartLocation(),
       event.getUILocation()
     );
-
-    // this.mask.node.active = false;
+    
+    this._slideMusic = false;
 
     const currentWorldPos = this.node.getWorldPosition();
     const distToOrigin = Vec3.squaredDistance(
@@ -173,16 +186,10 @@ export class CubeView extends Component {
     EventBus.instance.emit(CubeEvent.onCubeDragEnd, this.node);
     // 触摸移动距离超过容差，视为拖动操作
     if (distToOrigin > this._moveTolerance) {
-      // EventBus.instance.emit(CubeEvent.onCubeDragEnd, this.node);
-
-      EventBus.instance.emit(CubeEvent.onCubeReturn, this.node);//test
-      //匹配失败，回弹
-      
-
+      EventBus.instance.emit(CubeEvent.onCubeReturn, this.node);
+      //匹配失败，回弹      
     } else {
-      // this.node.setSiblingIndex(this._siblingIndex);
-      // this.mask.node.active = false;
-      EventBus.instance.emit(CubeEvent.onShakeCube, this.node);  
+      // EventBus.instance.emit(CubeEvent.onShakeCube, this.node);       
       if (this.node.name === "cube_16" ) {
             EventBus.instance.emit(EventBus.UpdateTimer);
       }    

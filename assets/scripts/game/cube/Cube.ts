@@ -4,6 +4,7 @@ import { CubeView } from './view/CubeView';
 import { CubeBll } from './bll/CubeBll';
 import { CubeEvent } from './CubeEvent';
 import { EventBus } from '../../event/EventBus';
+import { Sound } from '../../sound/Sound';
 
 const { ccclass, property } = _decorator;
 
@@ -129,7 +130,8 @@ export class Cube extends Component {
                 }
             }
         })
-        .call(()=>{            
+        .call(()=>{      
+            Sound.ins.playOneShot(Sound.effect.fly);      
             EventBus.instance.emit(CubeEvent.FlyEnd, this.model.id);    
             this.node.removeFromParent();            
             this.node.destroy();        
