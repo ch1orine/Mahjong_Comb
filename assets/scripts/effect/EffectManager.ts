@@ -17,6 +17,8 @@ import { Sound } from "../sound/Sound";
 import { EventBus } from "../event/EventBus";
 import { ConnectLine } from "./ConnectLine";
 import { EffectEvent } from "./EffectEvent";
+import { CubeEvent } from "../game/cube/CubeEvent";
+import { Shadow } from "./Shadow";
 const { ccclass } = _decorator;
 
 @ccclass("EffectManager")
@@ -33,11 +35,18 @@ export class EffectManager {
       // node.parent = find("gui/game/LayerGame");
     });
 
-    EventBus.instance.on(EffectEvent.Line, this.PlayLine, this);
+    resources.load(`effect/shadow`, Prefab, (err, prefab) => {
+      if (err) {
+        console.error(err);
+      }
+    });
+
+    EventBus.instance.on(EffectEvent.Line, this.playLine, this);
+    EventBus.instance.on(CubeEvent.FlyStart, this.showShadow, this);
   }
 
   
-  PlayLine(s:Vec3, e:Vec3){
+  playLine(s:Vec3, e:Vec3){
     resources.load(`effect/line`, Prefab, (err, prefab) => {
       if (err) {
         console.error(err);
@@ -49,4 +58,16 @@ export class EffectManager {
     });
   }
 
+  showShadow(cube: Node){
+    resources.load(`effect/shadow`, Prefab, (err, prefab) => {
+      if (err) {
+        console.error(err);
+      }
+       const node = instantiate(prefab);
+       const shadow = node.getComponent(Shadow);
+       node.parent = cube.parent;
+       node.setSiblingIndex(cube.getSiblingIndex()-1);
+       shadow.followNode = cube;
+    })
+  }
 }

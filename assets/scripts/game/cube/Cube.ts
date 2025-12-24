@@ -2,6 +2,9 @@ import { _decorator, Component, math, Node, resources, SpriteFrame, tween, v3, V
 import { CubeModel } from './model/CubeModel';
 import { CubeView } from './view/CubeView';
 import { CubeBll } from './bll/CubeBll';
+import { CubeEvent } from './CubeEvent';
+import { EventBus } from '../../event/EventBus';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('Cube')
@@ -90,39 +93,46 @@ export class Cube extends Component {
         const posW = this.node.getWorldPosition().clone();
         const pos = target.getWorldPosition();
         pos.add(v3(-view.getVisibleSize().width / 2, -view.getVisibleSize().height / 2,0));
-        
-        console.log(posW);
+                
         // 根据start坐标计算延迟差值，y坐标越小延迟越长
-        const delayOffset = 100 / posW.y // + posW.x / 6000;
+        const delayOffset = 100 / posW.y + posW.x / 4000;
         const totalDelay = 0.25 + delayOffset;
         
         // const control = v3(500, 600, 0);
-        const control = this.bll.controlPoint(start, pos, 0,400, 200);
 
+        let control = this.bll.controlPoint(start, pos, 0, 500, 100);
+        if (this.node.name === "cube_16" ||this.node.name === 'cube_17' || this.node.name === 'cube_18'){ 
+            control = this.bll.controlPoint(start, pos, -100, 150, 100);
+        }
+        this.node.setSiblingIndex(this.node.getSiblingIndex() + 6); //确保在最上层显示
+        // this.activeMask(true);
         tween(this.node)
-        .to(0.25, {scale: v3(1.15, 1.15, 1)})      
+        .to(0.25, {position: v3(start.x, start.y + 10, start.z) })
+        .to(0.25, {scale: v3(1.1, 1.1, 1)})             
         .call(()=>{
             this.activeMask(false);
+            EventBus.instance.emit(CubeEvent.FlyStart, this.node);
         })
         .start();    
 
         tween({t:0})
         .delay(totalDelay)
-        .to(0.5 + delayOffset, {t: 1}, {
+        .to(0.7 + delayOffset, {t: 1}, {
             easing:'quadInOut', 
             onUpdate:(v)=>{
                 const target = this.bll.bezier(start, control, pos, v.t)
-                this.node.setPosition(target);
-                if(v.t >= 0.8){
-                    // this.node.setScale(v3(1.15 - 0.33 * v.t, 1.15 - 0.33 * v.t, 1));
+                this.node.setPosition(target);                
+                if(v.t >= 0.8){                    
                     tween(this.node)
-                    .to(0.2, {scale: v3(0.833, 0.833, 1)})
+                    .to(0.2, {scale: v3(0.833, 0.833, 1)})          
                     .start();
                 }
             }
         })
-        .call(()=>{
-            // this.node.setScale(v3(0.833, 0.833, 1));
+        .call(()=>{            
+            EventBus.instance.emit(CubeEvent.FlyEnd, this.model.id);    
+            this.node.removeFromParent();            
+            this.node.destroy();        
         })
         .start();
     }
@@ -130,12 +140,16 @@ export class Cube extends Component {
     /** 销毁动画 */
     destroyAnim(){
         tween(this.node)    
-        .to(0.2, {scale: v3(1.15, 1.15, 1)})        
+        .to(0.2, {scale: v3(1.1, 1.1, 1)})        
         .call(()=>{
             this.node.removeFromParent();            
             this.node.destroy();  
         })
         .start();
+    }
+
+    clearEvent() {
+        this.view.clearEvent();
     }
 }
 

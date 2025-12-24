@@ -53,6 +53,7 @@ constructor() {
     EventBus.instance.on(CubeEvent.onFollowCube, this.onFollowCube, this);
     EventBus.instance.on(CubeEvent.onCubeDragEnd, this.onCubeDragEnd, this);
     EventBus.instance.on(CubeEvent.onCubeReturn, this.onCubeReturn, this);
+    EventBus.instance.on(CubeEvent.CanDrag, this.CanDrag, this);
   }
 
   private onCubeClick(node: Node, callback:(data:any)=>void) {
@@ -81,5 +82,11 @@ constructor() {
 
   private onCubeReturn() {
     this.CubeManagerBll.returnOrigin();//被移动的麻将回到原位
+  }
+
+  private CanDrag() {
+    this.CubeManagerModel.cubes.forEach((cube)=>{   
+      cube.view.candrag = true;   
+    });
   }
 }

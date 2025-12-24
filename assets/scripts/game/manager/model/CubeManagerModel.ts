@@ -1,5 +1,8 @@
 import { _decorator, Component, Node } from "cc";
 import { Cube } from "../../cube/Cube";
+import { EventBus } from "../../../event/EventBus";
+import { CubeEvent } from "../../cube/CubeEvent";
+import { JumpEvent } from "../../jump/JumpEvent";
 const { ccclass } = _decorator;
 
 @ccclass("CubeManagerModel")
@@ -95,18 +98,22 @@ export class CubeManagerModel {
     if (index > -1) {
       this.cubes.splice(index, 1);
     }
-    if(this.checkIsBar(cube.model.id)) {
-      console.log("remove bar cube");
-      cube.flyAnim();
+    if(this.checkIsBar(cube.model.id)) {      
+      cube.flyAnim();      
     }
     else {      
       cube.destroyAnim();
     }
+    
+    if (cube.node.name === "cube_16") {
+      EventBus.instance.emit(CubeEvent.CanDrag);
+    }
+    cube.clearEvent();
+    EventBus.instance.emit(JumpEvent.onJump);
   }
 
   checkIsBar(val: number): boolean {
     return this._barMap.includes(val);
   }  
-
   
 }

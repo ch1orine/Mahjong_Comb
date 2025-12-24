@@ -13,4 +13,12 @@ export enum CubeEvent {
 
   /** 回归原位 */
   onCubeReturn = "onReturn",
+
+  /** 麻将飞行动画开始 */
+  FlyStart = "CubeFlyStart",
+
+  /** 麻将飞行动画结束 */
+  FlyEnd = "CubeFlyEnd",
+
+  CanDrag = "CanDrag"
 }

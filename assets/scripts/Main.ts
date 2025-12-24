@@ -31,10 +31,12 @@ export class Main extends Component {
     //配置游戏数据
     gameConfig.loadConfig().then(() => {      
       this.init();
-      i18n.init(gameConfig.getSimplifiedLanguage()); // 设置为配置语言      
+      i18n.init(gameConfig.getSimplifiedLanguage()); // 设置为配置语言 
+      this.checkTimer();     
     });
 
     EventBus.instance.on(EventBus.UpdateTimer, this.checkTimer, this);
+    EventBus.instance.on(EventBus.StopTimer, this.stopTimer, this);
     EventBus.instance.on(EventBus.GameOver, this.onGameOver, this);
   }
 
@@ -76,7 +78,7 @@ export class Main extends Component {
       node.setSiblingIndex(1);
     });
 
-    this.camera.clearColor = Color.fromHEX(new Color(), gameConfig.getBGColor());
+    // this.camera.clearColor = Color.fromHEX(new Color(), gameConfig.getBGColor());
   }
 
   private checkTimer(){
@@ -84,10 +86,15 @@ export class Main extends Component {
     this._begin = true;
   }
 
+  private stopTimer(){
+    this._begin = false;
+  }
+
   protected update(dt: number): void {
     if (this._begin && Date.now() - this._currentTime >= this._intervalTime){
       this._begin = false;
-      EventBus.instance.emit(GuideEvent.GetGuideBlocks); 
+      EventBus.instance.emit(GuideEvent.ShowHand); 
+      // console.log("发出显示手指事件");
     }
   }
 

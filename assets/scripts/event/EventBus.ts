@@ -1,7 +1,10 @@
 //自定义事件总线
 import { Event, Node, EventTarget } from "cc";
 export class EventBus extends EventTarget {
+
   public static UpdateTimer = "UpdateTimer";
+
+  public static StopTimer = "StopTimer";
 
   public static GameOver = "GameOver";
 

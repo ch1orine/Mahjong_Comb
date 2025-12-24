@@ -1,115 +1,88 @@
-import { _decorator, director, instantiate, Node, Prefab, resources, Tween, tween, UIOpacity, UITransform, v3, Vec3, Sprite, Color} from "cc";
+import { _decorator, instantiate, Node, Prefab, resources, Tween, tween, v3, find} from "cc";
 import { GuideEvent } from "./GuideEven";
 import { EventBus } from "../../event/EventBus";
-import { gameConfig } from "../../common/GameConfig";
+import { Cube } from "../cube/Cube";
 const { ccclass } = _decorator;
 
 @ccclass("Guide")
 export class GuideManager {
   private _hand!: Node;
-
   private _mask!: Node;
 
-  private _offset: number = 75;
-
   constructor() {
-    const guideNode = new Node(); //创建一个节点作为guidelayer
-    guideNode.name = "GuideLayer";
-    director.getScene().children[0].addChild(guideNode); //添加节点到场景
-    const mapNode = director.getScene().children[0].children[0].getChildByName("Map");
+    // const guideNode = new Node(); //创建一个节点作为guidelayer
+    // guideNode.name = "GuideLayer";
+    // director.getScene().children[0].addChild(guideNode); //添加节点到场景
+    // const mapNode = director.getScene().children[0].children[0].getChildByName("Map");
 
-    resources.load(`prefabs/hand`, Prefab, (err, prefab) => {
+    resources.load(`hand/guide`, Prefab, (err, prefab) => {
         if (err) {
             console.error(err);
             return;
         }
         this._hand = instantiate(prefab);
-        this._hand.parent = guideNode;
+        this._hand.parent = find("gui/game");
+        this._hand.setPosition(-200,-4,0);
         this._hand.active = false;
-        this._offset = this._hand.getComponent(UITransform).width / 2;  
-           resources.load(`prefabs/mask`, Prefab, (err, prefab) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        this._mask = instantiate(prefab);
-        this._mask.parent = mapNode;
-        this._mask.setPosition(0,170,0);
-        const ui = this._mask.getComponent(UITransform);
-        ui.width = 170;
-        ui.height = 85;
-        this._mask.active = false; 
-        const sp = this._mask.getComponent(Sprite);
-        sp.color = Color.fromHEX(new Color(),gameConfig.getGuideColor());
-        EventBus.instance.emit(GuideEvent.GetGuideBlocks);       
-    });  
-            
-    });
+        this._mask = this._hand.children[0].children[0];
+        // this.showGuide();
+      });
 
- 
     EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
     EventBus.instance.on(GuideEvent.StopShowGuide, this.stopGuideShow, this);
   }
 
-  public showGuide(pos:Vec3[]){ 
-    
-    if (this._hand){          
-      this._hand.active = true;
-      this._mask.active = true;
-      this._hand.setPosition(pos[0].x + this._offset, pos[0].y - this._offset, 0);      
-      const opacity = this._hand.getComponent(UIOpacity);
-      opacity.opacity = 255;
-
-      const opacityMask = this._mask.getComponent(UIOpacity);
-      opacityMask.opacity = 255;
-
-      const ui = this._mask.getComponent(UITransform);
-      ui.width = Math.max((pos[1].x - pos[0].x) * 2, 85);
-      ui.height = Math.max((pos[0].y - pos[1].y) * 2, 85);      
-      this._mask.setPosition(pos[0].x + (pos[1].x - pos[0].x)/2, pos[0].y + (pos[1].y - pos[0].y)/2, 0);
-
-      //播放动画
+  public showGuide(){ 
+   const cube = find("gui/game/LayerGame/cube_16").getComponent(Cube);
+   cube.activeMask(true);
+   this._hand.setPosition(v3(-200,-4,0)); 
+   this._hand.active = true;
+   this._mask.active = false;
+    //   //播放动画
       tween(this._hand)
         .tag(0)
         .repeatForever(
           tween()
-          .to(0.5, { position: v3(pos[1].x + this._offset, pos[1].y - this._offset, pos[1].z) })
+          .to(1.5, { position: v3(155,-4,0) })
+          .call(() => {
+            this._mask.active = true;
+          })
           .delay(1)            
           .call(() => {
-            this._hand.setPosition(pos[0].x + this._offset, pos[0].y - this._offset, pos[0].z);            
+            this._hand.setPosition(v3(-200,-4,0)); 
+            this._mask.active = false;           
           })   
         )                
         .start();
         
-      tween(opacity)
-        .tag(0)
-        .repeatForever(
-          tween()
-          .delay(0.5)
-          .to(1, { opacity: 0 })                     
-          .call(() => {            
-            opacity.opacity = 255;
-          })    
-        )
-        .start();  
+    //   tween(opacity)
+    //     .tag(0)
+    //     .repeatForever(
+    //       tween()
+    //       .delay(0.5)
+    //       .to(1, { opacity: 0 })                     
+    //       .call(() => {            
+    //         opacity.opacity = 255;
+    //       })    
+    //     )
+    //     .start();  
       
-      tween(opacityMask)
-        .tag(0)
-        .repeatForever(
-          tween()
-          .delay(0.5)
-          .to(1, { opacity: 0 })                     
-          .call(() => {            
-            opacityMask.opacity = 255;
-          })    
-        )
-        .start();    
-    }
+    //   tween(opacityMask)
+    //     .tag(0)
+    //     .repeatForever(
+    //       tween()
+    //       .delay(0.5)
+    //       .to(1, { opacity: 0 })                     
+    //       .call(() => {            
+    //         opacityMask.opacity = 255;
+    //       })    
+    //     )
+    //     .start();    
+    // }
   }
 
-  public stopGuideShow(){    
-    this._hand.active = false;
-    this._mask.active = false;
+  public stopGuideShow(){        
+    this._hand.active = false;    
     Tween.stopAllByTag(0);    
   }  
 }

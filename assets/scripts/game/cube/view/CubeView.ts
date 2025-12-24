@@ -31,7 +31,7 @@ export class CubeView extends Component {
 
   private _originalWorldPos: Vec3; //记录初始世界位置
 
-  private _siblingIndex: number = 0;
+  // private _siblingIndex: number = 0;
 
   private _moveTolerance: number = 40; //拖动容差距离
 
@@ -66,7 +66,7 @@ export class CubeView extends Component {
     this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
 
     this.mask.node.active = false;
-    this._siblingIndex = this.node.getSiblingIndex();
+    // this._siblingIndex = this.node.getSiblingIndex();
   }
 
   private onTouchStart(event: EventTouch) {
@@ -79,6 +79,7 @@ export class CubeView extends Component {
     this._lockedDirection = null; // 重置锁定方向
     this._xDis = 0;
     this._yDis = 0;
+    EventBus.instance.emit(EventBus.StopTimer);
     EventBus.instance.emit(GuideEvent.StopShowGuide);
     EventBus.instance.emit(CubeEvent.onCubeClick, this, (data: any) => {
       this._maxDis = data;
@@ -89,6 +90,7 @@ export class CubeView extends Component {
     if (!this._canDrag || !this._isDragging) {
       return;
     }
+    EventBus.instance.emit(EventBus.StopTimer);
     const touchPos = event.getUILocation();
     const startPos = event.getUIStartLocation();
     const dis = Vec2.squaredDistance(startPos, touchPos);
@@ -178,11 +180,13 @@ export class CubeView extends Component {
       
 
     } else {
-      this.node.setSiblingIndex(this._siblingIndex);
+      // this.node.setSiblingIndex(this._siblingIndex);
       // this.mask.node.active = false;
-      EventBus.instance.emit(CubeEvent.onShakeCube, this.node);
-    }
-    // this.rePosAnim();
+      EventBus.instance.emit(CubeEvent.onShakeCube, this.node);  
+      if (this.node.name === "cube_16" ) {
+            EventBus.instance.emit(EventBus.UpdateTimer);
+      }    
+    }    
     // 重置状态
     this._xDis = 0;
     this._yDis = 0;
@@ -223,17 +227,17 @@ export class CubeView extends Component {
     this._originalWorldPos = wPos.clone();    
   }
 
-  public rePosAnim() {    
+  public rePosAnim() {            
     tween(this.node)
       .to(0.1, { position: this._originalPosition })
       .call(() => {
-        this.node.setSiblingIndex(this._siblingIndex);
+        // this.node.setSiblingIndex(this._siblingIndex);
       })
       .start();
   }
 
 
-  onDestroy() {
+  clearEvent() {
     this.node.off(Node.EventType.TOUCH_START, this.onTouchStart, this);
     this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
     this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
