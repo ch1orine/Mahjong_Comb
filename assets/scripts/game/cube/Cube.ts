@@ -109,7 +109,7 @@ export class Cube extends Component {
         // this.activeMask(true);
         tween(this.node)
         .to(0.25, {position: v3(start.x, start.y + 10, start.z) })
-        .to(0.25, {scale: v3(1.1, 1.1, 1)})             
+        // .to(0.25, {scale: v3(1.1, 1.1, 1)})             
         .call(()=>{
             this.activeMask(false);
             EventBus.instance.emit(CubeEvent.FlyStart, this.node);
@@ -118,7 +118,7 @@ export class Cube extends Component {
 
         tween({t:0})
         .delay(totalDelay)
-        .to(0.7 + delayOffset, {t: 1}, {
+        .to(0.5 + delayOffset, {t: 1}, {
             easing:'quadInOut', 
             onUpdate:(v)=>{
                 const target = this.bll.bezier(start, control, pos, v.t)
