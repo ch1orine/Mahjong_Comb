@@ -14,11 +14,11 @@ export class CubeManagerModel {
 
   private _barMap:number[] = [47, 51, 45, 39, 21];
 
-  public readonly SIZE: number = 118;
+  public readonly SIZE: number = 100;
 
-  public readonly OFFSET_COL: number = 2.5;
+  public readonly OFFSET_COL: number = 3;
   
-  public readonly OFFSET_ROW: number = 3.4;
+  public readonly OFFSET_ROW: number = 4;
 
   public readonly MOVE_TOLERANCE: number = 40;
 
@@ -30,14 +30,16 @@ export class CubeManagerModel {
    
   constructor() {
     this._map = [
-      [41, 31, 0, 31, 0, 0],
-      [0, 0, 0, 47, 51, 45],
-      [47, 51, 45, 0, 0, 0],
-      [0, 22, 0, 32, 16, 0],
-      [22, 0, 0, 0, 39, 0],
-      [0, 34, 21, 41, 0, 34],
-      [32, 0, 16, 39, 0, 0],
-      [21, 0, 0, 0, 0, 0],
+      [46, 47, 47, 46, 46, 52, 22],
+      [25, 52, 54, 47, 31, 32, 52],
+      [25, 25, 42, 52, 47, 45, 22],
+      [25, 32, 25, 45, 45, 47, 53],
+      [22, 51, 22, 34, 53, 47, 22],
+      [32, 47, 47, 47, 47, 47, 51],
+      [51, 54, 34, 53, 32, 42, 43],
+      [22, 51, 53, 25, 52, 52, 43],
+      [25, 53, 32, 32, 51, 31, 42],
+      [25, 46, 32, 54, 31, 46, 45],
     ];
   }
 

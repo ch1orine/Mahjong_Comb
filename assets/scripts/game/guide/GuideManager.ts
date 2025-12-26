@@ -28,7 +28,7 @@ export class GuideManager {
         // this.showGuide();
       });
 
-    EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
+    // EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
     EventBus.instance.on(GuideEvent.StopShowGuide, this.stopGuideShow, this);
   }
 
