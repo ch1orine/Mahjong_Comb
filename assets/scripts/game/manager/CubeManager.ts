@@ -12,35 +12,41 @@ const { ccclass, property } = _decorator;
 @ccclass("CubeManager")
 export class CubeManager {
   //数据层
-  CubeManagerModel!: CubeManagerModel;
+  model!: CubeManagerModel;
 
   //业务层
-  CubeManagerBll!: CubeManagerBll;
+  bll!: CubeManagerBll;
 
   //视图层
-  CubeManagerView!: CubeManagerView;
+  view!: CubeManagerView;
 
 
 /**
  *
  */
 constructor() {
-    this.CubeManagerModel = new CubeManagerModel();
-    this.CubeManagerBll = new CubeManagerBll();
-    this.CubeManagerView = new CubeManagerView();    
+    this.model = new CubeManagerModel();
+    this.bll = new CubeManagerBll();
+    // CubeManagerView 会在场景加载时通过事件注册自己
 }
 
   init() {
     this.generateBoardLayout();
     this.addEvents();
+    this.bll.init(this);
+  }
+
+  /** 设置 View 层（由场景中的组件调用） */
+  setView(view: CubeManagerView) {
+    this.view = view;
   }
 
   public generateBoardLayout() {
-    for (let r = 0; r < this.CubeManagerModel.map.length; r++) {
-      for (let c = 0; c < this.CubeManagerModel.map[r].length; c++) {
-        if (this.CubeManagerModel.map[r][c] === 0) continue;
-        this.CubeManagerBll.createCube(this, {
-          id: this.CubeManagerModel.map[r][c],
+    for (let r = 0; r < this.model.map.length; r++) {
+      for (let c = 0; c < this.model.map[r].length; c++) {
+        if (this.model.map[r][c] === 0) continue;
+        this.bll.createCube(this, {
+          id: this.model.map[r][c],
           row: r,
           col: c,
         });
@@ -48,47 +54,31 @@ constructor() {
     }
   }
 
-  private addEvents() {
-    EventBus.instance.on(CubeEvent.onCubeClick, this.onCubeClick, this);
+  private addEvents() {    
     EventBus.instance.on(CubeEvent.onShakeCube, this.onShakeCubes, this);
-    EventBus.instance.on(CubeEvent.onFollowCube, this.onFollowCube, this);
-    EventBus.instance.on(CubeEvent.onCubeDragEnd, this.onCubeDragEnd, this);
-    EventBus.instance.on(CubeEvent.onCubeReturn, this.onCubeReturn, this);
-    EventBus.instance.on(CubeEvent.CanDrag, this.CanDrag, this);
+    // EventBus.instance.on(CubeEvent.onFollowCube, this.onFollowCube, this);
+    // EventBus.instance.on(CubeEvent.onCubeDragEnd, this.onCubeDragEnd, this);
+    // EventBus.instance.on(CubeEvent.onCubeReturn, this.onCubeReturn, this);
+    // EventBus.instance.on(CubeEvent.CanDrag, this.CanDrag, this);
+    // 监听 View 层注册事件
+    EventBus.instance.on(CubeManagerEvent.RegisterView, this.setView, this);
   }
 
-  private onCubeClick(node: Node, callback:(data:any)=>void) {
-    // console.log("点击了麻将", cube.model);
-    this.CubeManagerBll.checkCubeMovable(this, node, callback);
-  }
 
   private onShakeCubes(node:Node) {
     // Sound.ins.playOneShot(Sound.effect.shake);  
     const cube = node.getComponent(Cube);
     const id = cube?.model.id || 0;
-    const cubes = this.CubeManagerModel.getCubesById(id);
+    const cubes = this.model.getCubesById(id);
     cubes.forEach((cube)=>{
       cube.activeMask(false);
       cube.shakeAnim();
     });
   }
 
-
-  private onFollowCube(data: any) {
-    this.CubeManagerBll.followCube(this, data.node, data.isHorizontal, data.delta);
-  }
-
-  private onCubeDragEnd(node: Node) {
-    this.CubeManagerBll.pairCube(this, node);
-  }
-
-  private onCubeReturn() {
-    this.CubeManagerBll.returnOrigin();//被移动的麻将回到原位
-  }
-
-  private CanDrag() {
-    this.CubeManagerModel.cubes.forEach((cube)=>{   
-      cube.view.candrag = true;   
-    });
-  }
+  // private CanDrag() {
+  //   this.model.cubes.forEach((cube)=>{   
+  //     cube.view.candrag = true;   
+  //   });
+  // }
 }

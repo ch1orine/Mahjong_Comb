@@ -10,11 +10,6 @@ export class GuideManager {
   private _mask!: Node;
 
   constructor() {
-    // const guideNode = new Node(); //创建一个节点作为guidelayer
-    // guideNode.name = "GuideLayer";
-    // director.getScene().children[0].addChild(guideNode); //添加节点到场景
-    // const mapNode = director.getScene().children[0].children[0].getChildByName("Map");
-
     resources.load(`hand/guide`, Prefab, (err, prefab) => {
         if (err) {
             console.error(err);
@@ -24,8 +19,7 @@ export class GuideManager {
         this._hand.parent = find("gui/game");
         this._hand.setPosition(-200,-4,0);
         this._hand.active = false;
-        this._mask = this._hand.children[0].children[0];
-        // this.showGuide();
+        this._mask = this._hand.children[0].children[0];        
       });
 
     // EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
@@ -33,7 +27,7 @@ export class GuideManager {
   }
 
   public showGuide(){ 
-   const cube = find("gui/game/LayerGame/cube_16").getComponent(Cube);
+   const cube = find("gui/game/LayerGame/cube_8").getComponent(Cube);
    cube.activeMask(true);
    this._hand.setPosition(v3(-200,-4,0)); 
    this._hand.active = true;
@@ -43,7 +37,7 @@ export class GuideManager {
         .tag(0)
         .repeatForever(
           tween()
-          .to(1.5, { position: v3(155,-4,0) })
+          .to(1.5, { position: v3(155,-4,0)})
           .call(() => {
             this._mask.active = true;
           })

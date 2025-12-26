@@ -57,8 +57,7 @@ export class Main extends Component {
       }
       const node = instantiate(prefab);
       node.parent = this.node;
-      node.setSiblingIndex(0);
-      // node.children[2].children[0].getComponent(Label).color = Color.fromHEX(new Color(), gameConfig.getTitleColor());
+      node.setSiblingIndex(0);      
       EventBus.instance.on(EventBus.GameOver, () => {
         node.pauseSystemEvents(true);
       });
@@ -78,8 +77,7 @@ export class Main extends Component {
       node.parent = this.node;
       node.setSiblingIndex(1);
     });
-
-    // this.camera.clearColor = Color.fromHEX(new Color(), gameConfig.getBGColor());
+    
   }
 
   private checkTimer(){

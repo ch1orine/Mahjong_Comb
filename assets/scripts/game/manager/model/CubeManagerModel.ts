@@ -1,9 +1,6 @@
-import { _decorator, Component, Node } from "cc";
+import { _decorator } from "cc";
 import { Cube } from "../../cube/Cube";
-import { EventBus } from "../../../event/EventBus";
-import { CubeEvent } from "../../cube/CubeEvent";
-import { JumpEvent } from "../../jump/JumpEvent";
-import { Sound } from "../../../sound/Sound";
+
 const { ccclass } = _decorator;
 
 @ccclass("CubeManagerModel")
@@ -96,27 +93,32 @@ export class CubeManagerModel {
     return this.cubes.filter((cube) => cube.model.id === id);    
   }
 
-  removeCube(cube: Cube) {
+  /** 移除麻将
+   * @param cube 
+   * @returns 是否计分
+   */
+  removeCube(cube: Cube): boolean {
     const index = this.cubes.indexOf(cube);
     if (index > -1) {
       this.cubes.splice(index, 1);
     }
-    if(this.checkIsBar(cube.model.id)) {      
-      cube.flyAnim();      
-    }
-    else {      
-      cube.destroyAnim();
-      Sound.ins.playOneShot(Sound.effect.line);
-    }
+    return this.checkIsBar(cube.model.id);
+    // if(this.checkIsBar(cube.model.id)) {      
+    //   cube.flyAnim();      
+    // }
+    // else {      
+    //   cube.destroyAnim();
+    //   Sound.ins.playOneShot(Sound.effect.line);
+    // }
     
-    if (cube.node.name === "cube_16") {
-      EventBus.instance.emit(CubeEvent.CanDrag);
-    }
-    cube.clearEvent();
-    EventBus.instance.emit(JumpEvent.onJump);
+    // if (cube.node.name === "cube_16") {
+    //   EventBus.instance.emit(CubeEvent.CanDrag);
+    // }
+    // cube.clearEvent();
+    // EventBus.instance.emit(JumpEvent.onJump);
   }
 
-  checkIsBar(val: number): boolean {
+  private checkIsBar(val: number): boolean {
     return this._barMap.includes(val);
   }  
   

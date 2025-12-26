@@ -6,7 +6,7 @@ import { CubeEvent } from './CubeEvent';
 import { EventBus } from '../../event/EventBus';
 import { Sound } from '../../sound/Sound';
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass('Cube')
 export class Cube extends Component {
@@ -20,6 +20,7 @@ export class Cube extends Component {
         this.model = this.addComponent(CubeModel);
         this.bll = this.addComponent(CubeBll);
         this.view = this.getComponent(CubeView);
+        this.view.enabled = false;
     }
 
     /** 加载显示图并初始化位置
@@ -63,26 +64,18 @@ export class Cube extends Component {
         .start();
     }
 
-
-    rePosAnim() {
-    this.view.rePosAnim();
-    }
-
-
-    /** 更新位置 
-     * @param rowoffset 行偏移
-     * @param coloffset 列偏移
-    */
-    updateCube(rowoffset: number, coloffset: number) {
-        this.model.addoffsetCube(rowoffset, coloffset);                
+    selectAnim(){
+        tween(this.node)
+        .to(0.3, {scale: v3(1.2, 1.2, 1)},{easing: 'sineOut'})
+        .to(0.3, {scale: v3(1, 1, 1)},{easing: 'sineOut'})
+        .start();
     }
 
     /** 更新视图位置 */
-    updateViewPos(pos: Vec3, wPos: Vec3){
-        this.view.updateCube(pos, wPos);
+    moveTo(pos: Vec3){
+        this.view.moveTo(pos);
     }
     
-
     activeMask(active: boolean){
         this.view.mask.node.active = active;
     }
@@ -98,21 +91,16 @@ export class Cube extends Component {
         // 根据start坐标计算延迟差值，y坐标越小延迟越长
         const delayOffset = 100 / posW.y + posW.x / 4000;
         const totalDelay = 0.25 + delayOffset;
-        
-        // const control = v3(500, 600, 0);
-
+                
         let control = this.bll.controlPoint(start, pos, 0, 500, 100);
         if (this.node.name === "cube_16" ||this.node.name === 'cube_17' || this.node.name === 'cube_18'){ 
             control = this.bll.controlPoint(start, pos, -100, 150, 100);
         }
-        this.node.setSiblingIndex(this.node.getSiblingIndex() + 6); //确保在最上层显示
-        // this.activeMask(true);
+        this.node.setSiblingIndex(this.node.getSiblingIndex() + 6); //确保在最上层显示        
         tween(this.node)
-        .to(0.25, {position: v3(start.x, start.y + 10, start.z) })
-        // .to(0.25, {scale: v3(1.1, 1.1, 1)})             
+        .to(0.25, {position: v3(start.x, start.y + 10, start.z) })                 
         .call(()=>{
-            this.activeMask(false);
-            // EventBus.instance.emit(CubeEvent.FlyStart, this.node);
+            this.activeMask(false);            
         })
         .start();    
 
@@ -154,8 +142,8 @@ export class Cube extends Component {
         .start();
     }
 
-    clearEvent() {
-        this.view.clearEvent();
-    }
+    // clearEvent() {
+    //     // this.view.clearEvent();
+    // }
 }
 

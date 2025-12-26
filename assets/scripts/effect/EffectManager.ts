@@ -3,15 +3,9 @@ import {
   instantiate,
   Node,
   Prefab,
-  resources,
-  tween,
-  UIOpacity,
+  resources,  
   Vec3,
-  Animation,
-  Color,
-  director,
-  find,
-  Line,
+  find,  
 } from "cc";
 import { Sound } from "../sound/Sound";
 import { EventBus } from "../event/EventBus";
@@ -24,24 +18,18 @@ const { ccclass } = _decorator;
 @ccclass("EffectManager")
 export class EffectManager {
 
-
+  private _lines: ConnectLine[] = []; //连接线
 
   constructor() {    
     resources.load(`effect/line`, Prefab, (err, prefab) => {
-      if (err) {
-        console.error(err);
-      }
-      // const node = instantiate(prefab);
-      // node.parent = find("gui/game/LayerGame");
     });
 
     resources.load(`effect/shadow`, Prefab, (err, prefab) => {
-      if (err) {
-        console.error(err);
-      }
     });
 
     EventBus.instance.on(EffectEvent.Line, this.playLine, this);
+    EventBus.instance.on(EffectEvent.LineRemove, this.removeLine, this);
+
     EventBus.instance.on(CubeEvent.FlyStart, this.showShadow, this);
   }
 
@@ -54,6 +42,7 @@ export class EffectManager {
        const node = instantiate(prefab);
        node.parent = find("gui/game/LayerEffect");
        const line = node.getComponent(ConnectLine);
+       this._lines.push(line);
        line.playAnim(s,e);
     });
   }
@@ -69,5 +58,11 @@ export class EffectManager {
        node.setSiblingIndex(cube.getSiblingIndex()-1);
        shadow.followNode = cube;
     })
+  }
+
+  removeLine(){ 
+    if(this._lines.length > 0){
+      this._lines.pop()?.node.removeFromParent();
+    }
   }
 }

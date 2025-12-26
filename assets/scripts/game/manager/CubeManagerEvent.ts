@@ -1,14 +1,13 @@
-import { _decorator, Component, Node } from 'cc';
-const { ccclass, property } = _decorator;
 
-@ccclass('CubeManagerEvent')
-export class CubeManagerEvent extends Component {
-    start() {
 
-    }
+export enum CubeManagerEvent {
+    
+    // View 层注册事件
+    RegisterView = 'CubeManagerEvent.RegisterView',
 
-    update(deltaTime: number) {
-        
-    }
+    // 触摸事件
+    TouchStart = 'CubeManagerEvent.TouchStart',
+    TouchMove = 'CubeManagerEvent.TouchMove',
+    TouchEnd = 'CubeManagerEvent.TouchEnd',
+
 }
-

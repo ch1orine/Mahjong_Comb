@@ -232,24 +232,11 @@ export class CubeView extends Component {
     this._originalWorldPos = this.node.getWorldPosition().clone();
   }
 
-  public updateCube(pos: Vec3, wPos: Vec3) {
-    this._originalPosition = pos.clone();
-    this._originalWorldPos = wPos.clone();    
-  }
-
-  public rePosAnim() {            
-    tween(this.node)
-      .to(0.1, { position: this._originalPosition })
-      .call(() => {
-        // this.node.setSiblingIndex(this._siblingIndex);
-      })
-      .start();
+  public moveTo(pos: Vec3) {
+    console.log("moveTo", pos);
+    // this._originalPosition = pos.clone();
+    // this._originalWorldPos = wPos.clone();    
   }
 
 
-  clearEvent() {
-    this.node.off(Node.EventType.TOUCH_START, this.onTouchStart, this);
-    this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
-    this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-  }
 }
