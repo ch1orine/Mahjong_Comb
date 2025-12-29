@@ -7,7 +7,7 @@ const { ccclass, property } = _decorator;
 export class CubeManagerView extends Component {
     
     @property(Node)
-    cubeContainer: Node = null; // cube 的父容器节点
+    cubeContainer!: Node; // cube 的父容器节点
 
     onLoad() {
         // 将自己注册到 CubeManager

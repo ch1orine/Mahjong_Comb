@@ -1,5 +1,5 @@
 import { _decorator, instantiate, Node, Prefab, resources, Tween, tween, v3, find} from "cc";
-import { GuideEvent } from "./GuideEven";
+import { GuideEvent } from "./GuideEvent";
 import { EventBus } from "../../event/EventBus";
 import { Cube } from "../cube/Cube";
 const { ccclass } = _decorator;
@@ -22,14 +22,14 @@ export class GuideManager {
         this._mask = this._hand.children[0].children[0];        
       });
 
-    // EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
+    EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
     EventBus.instance.on(GuideEvent.StopShowGuide, this.stopGuideShow, this);
   }
 
   public showGuide(){ 
    const cube = find("gui/game/LayerGame/cube_8").getComponent(Cube);
-   cube.activeMask(true);
-   this._hand.setPosition(v3(-200,-4,0)); 
+  //  cube.activeMask(true);
+   this._hand.setPosition(v3(-200, 120, 0)); 
    this._hand.active = true;
    this._mask.active = false;
     //   //播放动画
@@ -37,13 +37,13 @@ export class GuideManager {
         .tag(0)
         .repeatForever(
           tween()
-          .to(1.5, { position: v3(155,-4,0)})
+          .to(1.5, { position: v3(0, -80, 0)})
           .call(() => {
             this._mask.active = true;
           })
           .delay(1)            
           .call(() => {
-            this._hand.setPosition(v3(-200,-4,0)); 
+            this._hand.setPosition(v3(-200, 120, 0)); 
             this._mask.active = false;           
           })   
         )                

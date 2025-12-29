@@ -4,7 +4,7 @@ import { Sound } from "./sound/Sound";
 import super_html_playable from "./common/super_html_playable";
 import { EventBus } from "./event/EventBus";
 import { GuideManager } from "./game/guide/GuideManager";
-import { GuideEvent } from "./game/guide/GuideEven";
+import { GuideEvent } from "./game/guide/GuideEvent";
 import * as i18n from 'db://i18n/LanguageData';
 import { CubeManager } from "./game/manager/CubeManager";
 import { EffectManager } from "./effect/EffectManager";
@@ -35,8 +35,8 @@ export class Main extends Component {
       this.checkTimer();     
     });
 
-    EventBus.instance.on(EventBus.UpdateTimer, this.checkTimer, this);
-    EventBus.instance.on(EventBus.StopTimer, this.stopTimer, this);
+    EventBus.instance.on(EventBus.UpdateTimer, this.checkTimer, this); //恢复计时
+    EventBus.instance.on(EventBus.StopTimer, this.stopTimer, this);   //阻断计时
     EventBus.instance.on(EventBus.GameOver, this.onGameOver, this);
   }
 
@@ -47,7 +47,7 @@ export class Main extends Component {
     // （ 解决ironsource移动广告平台声音问题，Only : ironsource ） 游戏开始时，获取声音状态以决定是否将音量设置为0。
     if (super_html_playable.is_audio()) Sound.ins.volume = 1;
     else Sound.ins.volume = 0;
-    // Sound.ins.play(Sound.music.bgm);
+    Sound.ins.play(Sound.music.bgm);
   }
 
   init() {
@@ -63,8 +63,7 @@ export class Main extends Component {
       });
       const manager = new CubeManager();
       manager.init();
-      const effect = new EffectManager();
-      
+      const effect = new EffectManager();      
       const guide = new GuideManager();
       // guide.init();
     });

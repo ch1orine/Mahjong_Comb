@@ -15,10 +15,5 @@ export class CubeModel extends Component {
         this.row = 0;
         this.col = 0;
     }
-
-    addoffsetCube(row: number, col: number) {
-        this.row += row;
-        this.col += col;
-    }
 }
 

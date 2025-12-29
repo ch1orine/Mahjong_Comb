@@ -2,18 +2,23 @@ import {
   _decorator,
   Component,
   EventTouch,
+  find,
   math,
   Node,
   Sprite,
   tween,
   UITransform,
+  v3,
   Vec2,
   Vec3,
+  view,
 } from "cc";
 import { EventBus } from "../../../event/EventBus";
 import { CubeEvent } from "../CubeEvent";
-import { GuideEvent } from "../../guide/GuideEven";
+import { GuideEvent } from "../../guide/GuideEvent";
 import { Sound } from "../../../sound/Sound";
+import { Cube } from "../Cube";
+import { EffectEvent } from "../../../effect/EffectEvent";
 const { ccclass, property } = _decorator;
 
 @ccclass("CubeView")
@@ -21,8 +26,8 @@ export class CubeView extends Component {
   @property({ type: Sprite, tooltip: "麻将图片" })
   sprite!: Sprite;
 
-  @property({ type: Sprite, tooltip: "遮罩图片" })
-  mask!: Sprite;
+  @property({ type: Node, tooltip: "遮罩图片" })
+  mask!: Node;
 
   private _canDrag: boolean = true; //是否可以拖拽
 
@@ -68,7 +73,7 @@ export class CubeView extends Component {
     this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
     this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
 
-    this.mask.node.active = false;
+    this.mask.active = false;
     // this._siblingIndex = this.node.getSiblingIndex();
   }
 
@@ -77,7 +82,7 @@ export class CubeView extends Component {
       return;
     }        
 
-    this.mask.node.active = true;
+    this.mask.active = true;
     this._isDragging = true;
     this._lockedDirection = null; // 重置锁定方向
     this._xDis = 0;
@@ -232,11 +237,66 @@ export class CubeView extends Component {
     this._originalWorldPos = this.node.getWorldPosition().clone();
   }
 
-  public moveTo(pos: Vec3) {
-    console.log("moveTo", pos);
-    // this._originalPosition = pos.clone();
-    // this._originalWorldPos = wPos.clone();    
+  public moveTo(pos: Vec3) {    
+    tween(this.node)
+      .delay(0.5)
+      .to(0.4, { position: pos }, { easing: "sineOut" })
+      // .call(() => {
+      //   this.node.setPosition(pos);
+      // })
+      .start(); 
   }
 
-
+  public flyTo(e: Cube) {        
+        const target = find(`gui/game/Bar/Layout/${e.model.id}`);
+        if(!target){
+           tween(this.node)    
+           .to(0.2, {scale: v3(1.1, 1.1, 1)})        
+           .call(()=>{            
+              this.node.removeFromParent();            
+              this.node.destroy();  
+            })
+           .start();
+           return;
+        }                
+        const start = this.node.getPosition().clone();
+        const posW = this.node.getWorldPosition().clone();
+        const pos = target.getWorldPosition();
+        pos.add(v3(-view.getVisibleSize().width / 2, -view.getVisibleSize().height / 2, 0));
+            
+        //根据start坐标计算延迟差值，y坐标越小延迟越长
+        const delayOffset = 0 + posW.x / 4000;
+        const totalDelay = 0.25 + delayOffset;
+                
+        let control = e.bll.controlPoint(start, pos, 0, 500, 100);
+        this.node.setSiblingIndex(this.node.getSiblingIndex() + 6); //确保在最上层显示        
+        tween(this.node)
+        .to(0.25, {position: v3(start.x, start.y + 10, start.z) })                 
+        .call(()=>{
+            e.activeMask(false);            
+        })
+        .start();    
+        
+        tween({t:0})
+        .delay(totalDelay)
+        .to(0.5 + delayOffset, {t: 1}, {
+            easing:'quadInOut', 
+            onUpdate:(v)=>{
+                const target = e.bll.bezier(start, control, pos, v.t)
+                this.node.setPosition(target);                
+                if(v.t >= 0.8){                    
+                    tween(this.node)
+                    .to(0.2, {scale: v3(0.833, 0.833, 1)})          
+                    .start();
+                }
+            }
+        })
+        .call(()=>{      
+            // Sound.ins.playOneShot(Sound.effect.fly);      
+            EventBus.instance.emit(CubeEvent.FlyEnd, e.model.id);    
+            this.node.removeFromParent();            
+            this.node.destroy();        
+        })
+        .start();
+  }
 }

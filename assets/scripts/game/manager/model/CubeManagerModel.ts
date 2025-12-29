@@ -28,7 +28,7 @@ export class CubeManagerModel {
   constructor() {
     this._map = [
       [46, 47, 47, 46, 46, 52, 22],
-      [25, 52, 54, 47, 31, 32, 52],
+      [25, 52, 54, 47, 31, 53, 52],
       [25, 25, 42, 52, 47, 45, 22],
       [25, 32, 25, 45, 45, 47, 53],
       [22, 51, 22, 34, 53, 47, 22],
@@ -93,29 +93,75 @@ export class CubeManagerModel {
     return this.cubes.filter((cube) => cube.model.id === id);    
   }
 
-  /** 移除麻将
+  /** 移除麻将并记录列信息（不立即下落）
    * @param cube 
    * @returns 是否计分
    */
-  removeCube(cube: Cube): boolean {
+  removeCube(cube: Cube) {
     const index = this.cubes.indexOf(cube);
     if (index > -1) {
       this.cubes.splice(index, 1);
     }
-    return this.checkIsBar(cube.model.id);
-    // if(this.checkIsBar(cube.model.id)) {      
-    //   cube.flyAnim();      
-    // }
-    // else {      
-    //   cube.destroyAnim();
-    //   Sound.ins.playOneShot(Sound.effect.line);
-    // }
     
-    // if (cube.node.name === "cube_16") {
-    //   EventBus.instance.emit(CubeEvent.CanDrag);
-    // }
-    // cube.clearEvent();
-    // EventBus.instance.emit(JumpEvent.onJump);
+    // 清空该位置的地图值
+    const row = cube.model.row;
+    const col = cube.model.col;
+    this.updateMapValue(row, col, 0);
+  }
+
+  /** 整理指定列：将所有非空元素下沉，返回需要填充的数量
+   * @param col 列索引
+   * @returns 需要从顶部填充的cube数量
+   */
+  compactColumn(col: number): number {
+    const nonEmptyValues: number[] = [];
+    
+    // 收集该列所有非空值
+    for (let row = 0; row < this._map.length; row++) {
+      if (this._map[row][col] !== 0) {
+        nonEmptyValues.push(this._map[row][col]);
+      }
+    }
+    
+    // 清空该列
+    for (let row = 0; row < this._map.length; row++) {
+      this._map[row][col] = 0;
+    }
+    
+    // 从底部开始填充非空值
+    const startRow = this._map.length - nonEmptyValues.length;
+    for (let i = 0; i < nonEmptyValues.length; i++) {
+      this._map[startRow + i][col] = nonEmptyValues[i];
+    }
+    
+    // 返回需要填充的空位数量
+    return this._map.length - nonEmptyValues.length;
+  }
+
+
+
+  /** 获取指定列需要填充的空位数量（从顶部开始连续的0）
+   * @param col 列索引
+   * @returns 需要填充的数量
+   */
+  getEmptyCountInColumn(col: number): number {
+    let count = 0;
+    for (let row = 0; row < this._map.length; row++) {
+      if (this._map[row][col] === 0) {
+        count++;
+      } else {
+        break; // 遇到非空则停止计数
+      }
+    }
+    return count;
+  }
+
+  /** 生成随机 cube ID（从现有地图中随机选取）
+   * @returns cube ID
+   */
+  getRandomCubeId(): number {
+    const allIds = this._map.flat().filter(id => id > 0);
+    return allIds[Math.floor(Math.random() * allIds.length)];
   }
 
   private checkIsBar(val: number): boolean {

@@ -20,5 +20,4 @@ export enum CubeEvent {
   /** 麻将飞行动画结束 */
   FlyEnd = "CubeFlyEnd",
 
-  CanDrag = "CanDrag"
 }
