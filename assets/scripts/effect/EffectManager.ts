@@ -15,18 +15,21 @@ const { ccclass } = _decorator;
 @ccclass("EffectManager")
 export class EffectManager {
   
+  private _boomPrefab: Prefab = null;
   constructor() {    
     resources.load(`effect/boom`, Prefab, (err, prefab) => {
+      if (!err) {
+        this._boomPrefab = prefab;
+      }
     });
 
     EventBus.instance.on(EffectEvent.ShowBoom, this.showBoom, this);
   }
-
   
 
-
   showBoom(pos: Vec3){
-    const node = instantiate(resources.get(`effect/boom`, Prefab));
+    if(!this._boomPrefab) return;
+    const node = instantiate(this._boomPrefab);
     node.parent = find("gui/game/LayerEffect");
     node.setWorldPosition(pos);
     const spine = node.getComponent(sp.Skeleton);
