@@ -1,37 +1,36 @@
-import { _decorator, CCInteger, Component, Node, RichText } from 'cc';
+import { _decorator, Component, Label, tween } from 'cc';
 import { EventBus } from '../../event/EventBus';
-import { CubeEvent } from '../cube/CubeEvent';
 const { ccclass, property } = _decorator;
 
 @ccclass('Score')
 export class Score extends Component {
-    @property({ type: RichText, tooltip: "分数显示节点" })
-    label!: RichText;
+    @property(Label)
+    scoreLabel: Label = null!;
 
-    @property({ type: Node, tooltip: "方块节点" })
-    right!: Node;
+    private _currentScore: number = 0;
 
-    @property({ type: CCInteger, tooltip: "分数" })
-    count!: number;
+    private _addCount: number = 1;
 
-    // private _score: number = 0;
-
-    protected onLoad(): void {
-        EventBus.instance.on(CubeEvent.FlyEnd, this.onCubeFlyEnd, this); // 监听方块飞行结束事件
-        this.label.string = `${this.count}`;
+    start() {                   
+        EventBus.instance.on(EventBus.AddScore, this.playScoreAnimation, this);
     }
 
-
-    private onCubeFlyEnd(cubeId: number) {
-        if( cubeId.toString() === this.node.name) {
-        // 在这里处理方块飞行结束后的逻辑
-            this.count--;
-            this.label.string = `${this.count}`;
-            if (this.count < 1) {
-                this.label.node.active = false;
-                this.right.active = true;
-                EventBus.instance.off(CubeEvent.FlyEnd, this.onCubeFlyEnd, this); // 移除监听，避免重复触发
-            }
-        }
-    }
+   private playScoreAnimation(addScore: number = 8, duration: number = 0.4) {        
+        const start = this._currentScore;   
+        addScore *= this._addCount;     
+        tween({ value: 0 })
+            .to(duration, { value: 1 }, {
+                onUpdate: (obj: any) => {
+                    const t = obj.value;
+                    const display = Math.floor(start + addScore * t);
+                    this.scoreLabel.string = display.toString();
+                }
+            })
+            .call(() => {
+                this._currentScore += addScore;
+            })
+            .start();
+        this._addCount ++;    
+   }
 }
+

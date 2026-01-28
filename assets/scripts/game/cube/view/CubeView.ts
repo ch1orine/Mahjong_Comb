@@ -237,13 +237,14 @@ export class CubeView extends Component {
     this._originalWorldPos = this.node.getWorldPosition().clone();
   }
 
-  public moveTo(pos: Vec3) {    
-    tween(this.node)
-      .delay(0.5)
-      .to(0.4, { position: pos }, { easing: "sineOut" })
-      // .call(() => {
-      //   this.node.setPosition(pos);
-      // })
+  public moveTo(pos: Vec3, fnc: Function = null) {    
+    tween(this.node)      
+      .to(0.1, { position: pos }, { easing: "sineOut" })
+      .call(() => {
+        if (fnc) {
+          fnc();
+        }
+      })
       .start(); 
   }
 

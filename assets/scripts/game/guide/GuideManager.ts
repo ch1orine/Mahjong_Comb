@@ -9,6 +9,12 @@ const { ccclass } = _decorator;
 export class GuideManager {
   private _hand!: Node;
 
+
+    // EventBus.instance.on(EventBus.UpdateTimer, this.checkTimer, this); //恢复计时
+    // EventBus.instance.on(EventBus.StopTimer, this.stopTimer, this);   //阻断计时
+
+    // 
+  private _mask!: Node;
   constructor() {
     resources.load(`hand/guide`, Prefab, (err, prefab) => {
         if (err) {
@@ -17,63 +23,41 @@ export class GuideManager {
         }
         this._hand = instantiate(prefab);
         this._hand.parent = find("gui/game");
-        this._hand.setPosition(-200,-4,0);
-        this._hand.active = false;           
+        this._hand.setPosition(175, -4, 0);
+        this._mask = this._hand.children[0].getChildByName("mask")!;
+        this._hand.active = false;     
+        this._mask.active = false;
       });
 
     EventBus.instance.on(GuideEvent.ShowHand, this.showGuide, this);    
     EventBus.instance.on(GuideEvent.StopShowGuide, this.stopGuideShow, this);
   }
 
-  public showGuide(){ 
-   const cube = find("gui/game/LayerGame/cube_8")?.getComponent(Cube);
-   const cube2 = find("gui/game/LayerGame/cube_17")?.getComponent(Cube);
-   const cube3 = find("gui/game/LayerGame/cube_26")?.getComponent(Cube);
-     
-   this._hand.setPosition(v3(-200, 120, 0)); 
-   this._hand.active = true;  
-    //   //播放动画
-      tween(this._hand)
-        .tag(0)
-        .repeatForever(
+  public showGuide(){   
+    Tween.stopAllByTarget(this._hand);    
+
+    this._hand.active = true;
+    this._hand.setPosition(175, -4, 0);
+    this._mask.active = false;
+
+    tween(this._hand)
+    .repeatForever(
           tween()
-          .parallel(
-            tween()
-              .call(() => {
-                EventBus.instance.emit(EffectEvent.Line);
-                cube.activeMask(true);  // 0s 时显示 cube mask            
-              })
-              .delay(0.5)
-              .call(() => {
-                cube2.activeMask(true);  // 0.5s 时显示 cube2 mask
-              })
-              .delay(0.5)
-              .call(() => {
-                cube3.activeMask(true);  // 1s 时显示 cube3 mask
-              }),
-            tween()
-              .to(1.5, { position: v3(15, -105, 0) })  // 0s~1.5s 手移动动画
-          )
-          .delay(1)            
+          .to(1.0, { position: v3(175, -247, 0) })
           .call(() => {
-            this._hand.setPosition(v3(-200, 120, 0)); 
-            cube?.activeMask(false);
-            cube2?.activeMask(false);
-            cube3?.activeMask(false);      
-            EventBus.instance.emit(EffectEvent.LineRemove);               
-          })   
-        )                
-        .start();        
+            this._mask.active = true;
+          })
+          .delay(1.0)
+          .call(() => {
+              this._hand.setPosition(175, -4, 0);
+              this._mask.active = false;
+            })
+          )
+       .start();
   }
 
   public stopGuideShow(){        
     this._hand.active = false;    
-    const cube = find("gui/game/LayerGame/cube_8")?.getComponent(Cube);
-    const cube2 = find("gui/game/LayerGame/cube_17")?.getComponent(Cube);
-    const cube3 = find("gui/game/LayerGame/cube_26")?.getComponent(Cube);
-    cube?.activeMask(false);
-    cube2?.activeMask(false);
-    cube3?.activeMask(false);
-    Tween.stopAllByTag(0);    
+    Tween.stopAllByTarget(this._hand);    
   }  
 }

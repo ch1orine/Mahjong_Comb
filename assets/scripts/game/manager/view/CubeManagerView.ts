@@ -26,21 +26,16 @@ export class CubeManagerView extends Component {
         }
     }
 
-    private onTouchStart(event: EventTouch) {
-        const touchPos = event.getUILocation();
-        // console.log("Touch Start at: ", touchPos);
-        EventBus.instance.emit(CubeManagerEvent.TouchStart, touchPos);
+    private onTouchStart(event: EventTouch) {      
+        EventBus.instance.emit(CubeManagerEvent.TouchStart, event);
     }
 
     private onTouchMove(event: EventTouch) {
-        const touchPos = event.getUILocation();
-        // console.log("Touch Move at: ", touchPos);
-        EventBus.instance.emit(CubeManagerEvent.TouchMove, touchPos);
+        EventBus.instance.emit(CubeManagerEvent.TouchMove, event);
     }
 
     private onTouchEnd(event: EventTouch) {
-        console.log("Touch End");
-        EventBus.instance.emit(CubeManagerEvent.TouchEnd);
+        EventBus.instance.emit(CubeManagerEvent.TouchEnd, event);
     }
 }
 

@@ -8,6 +8,8 @@ export class EventBus extends EventTarget {
 
   public static GameOver = "GameOver";
 
+  public static AddScore = "AddScore";
+
   private static _instance: EventBus;
   public static get instance(): EventBus {
     if (EventBus._instance == null) {

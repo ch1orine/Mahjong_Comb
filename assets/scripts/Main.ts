@@ -47,7 +47,7 @@ export class Main extends Component {
     // （ 解决ironsource移动广告平台声音问题，Only : ironsource ） 游戏开始时，获取声音状态以决定是否将音量设置为0。
     if (super_html_playable.is_audio()) Sound.ins.volume = 1;
     else Sound.ins.volume = 0;
-    Sound.ins.play(Sound.music.bgm);
+    // Sound.ins.play(Sound.music.bgm);
   }
 
   init() {

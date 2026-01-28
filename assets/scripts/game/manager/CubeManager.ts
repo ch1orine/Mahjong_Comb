@@ -30,7 +30,7 @@ constructor() {
     // CubeManagerView 会在场景加载时通过事件注册自己
 }
 
-  init() {
+  init() {    
     this.generateBoardLayout();
     this.addEvents();
     this.bll.init(this);
@@ -41,10 +41,10 @@ constructor() {
     this.view = view;
   }
 
-  public generateBoardLayout() {
+  public generateBoardLayout() {    
     for (let r = 0; r < this.model.map.length; r++) {
       for (let c = 0; c < this.model.map[r].length; c++) {
-        if (this.model.map[r][c] === 0) continue;
+        if (this.model.map[r][c] === -1) continue;
         this.bll.createCube(this, {
           id: this.model.map[r][c],
           row: r,

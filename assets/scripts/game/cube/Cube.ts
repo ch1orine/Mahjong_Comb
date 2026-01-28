@@ -44,7 +44,7 @@ export class Cube extends Component {
 
     /** 生成动画 */
     geneAnim(){
-        const duration = math.randomRange(0.1, 0.4);
+        const duration = 0.03;//math.randomRange(0.1, 0.15);
         const scale = math.randomRange(0.2, 0.5);
         this.node.setScale(v3(scale, scale, 1));
         tween(this.node)        
@@ -54,13 +54,16 @@ export class Cube extends Component {
 
 
     /** 抖动动画 */
-    shakeAnim(){
+    shakeAnim(fn: Function = null){
         tween(this.node)
         .to(0.06,{angle:10})
         .to(0.06,{angle:-10})
         .union()        
         .repeat(2)
-        .to(0.1,{angle:0})
+        .to(0.08,{angle:0})
+        .call(()=>{
+            if(fn) fn();
+        })
         .start();
     }
 
@@ -72,21 +75,26 @@ export class Cube extends Component {
     }
 
     /** 更新视图位置 */
-    moveTo(pos: Vec3){
-        this.view.moveTo(pos);
+    moveTo(pos: Vec3, fnc: Function = null){
+        this.view.moveTo(pos, fnc);
     }
     
     activeMask(active: boolean){
         this.view.mask.active = active;
     }
 
-    /** 消除动画 */
-    destroyAnim(){
-        this.view.flyTo(this);        
+    /** 缩小动画 */
+    scaleAnim(){
+        tween(this.node)
+        .to(0.3, {scale: v3(0.0, 0.0, 1)},{easing: 'sineOut'})
+        .start();
     }
 
-    // clearEvent() {
-    //     // this.view.clearEvent();
-    // }
+    /** 消除动画 */
+    destroyAnim(){
+        // this.view.flyTo(this);   
+        this.node.active = false;     
+    }
+
 }
 
