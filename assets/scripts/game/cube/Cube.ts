@@ -48,7 +48,11 @@ export class Cube extends Component {
         const scale = math.randomRange(0.2, 0.5);
         this.node.setScale(v3(scale, scale, 1));
         tween(this.node)        
-        .to(duration, { scale: v3(1, 1, 1) },{easing: 'linear'})
+        .to(duration, { scale: v3(1, 1, 1) },{easing: 'linear'})        
+        .to(0.08, { scale: v3(0.9, 0.9, 1) },{easing: 'sineOut'})
+        .to(0.08, { scale: v3(1, 1, 1) },{easing: 'sineIn'})
+        .union()
+        .repeat(2)
         .start();
     }
 

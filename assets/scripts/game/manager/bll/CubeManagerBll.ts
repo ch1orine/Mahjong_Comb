@@ -10,6 +10,7 @@ import {
   view,
   math,
   EventTouch,
+  Sprite,
 } from "cc";
 import { CubeManager } from "../CubeManager";
 import { Cube } from "../../cube/Cube";
@@ -36,6 +37,8 @@ export class CubeManagerBll  {
 
   private _finished: boolean = false;
 
+  private _guide: boolean = true;
+
   init(e: CubeManager) {
     this.addEvents(e); 
     this._size = view.getVisibleSize();   
@@ -45,7 +48,9 @@ export class CubeManagerBll  {
   public addEvents(e: CubeManager){
     EventBus.instance.on(CubeManagerEvent.TouchStart, (event: EventTouch) => this.onTouchStart(e, event), this);
     EventBus.instance.on(CubeManagerEvent.TouchMove, (event: EventTouch) => this.onTouchMove(e, event), this);
-    EventBus.instance.on(CubeManagerEvent.TouchEnd, (event: EventTouch) => this.onTouchEnd(e, event), this);    
+    EventBus.instance.on(CubeManagerEvent.TouchEnd, (event: EventTouch) => this.onTouchEnd(e, event), this);  
+    // EventBus.instance.on(GuideEvent.ShowMask, (flag: boolean) => this.setMask(e, flag), this);
+    // this.setMask(e, true); // 初始化时显示遮罩
   }
 
 
@@ -53,8 +58,12 @@ export class CubeManagerBll  {
     // console.log(event.target as Cube);
     EventBus.instance.emit(GuideEvent.StopShowGuide);
     EventBus.instance.emit(EventBus.StopTimer);   //阻断计时          
-    const cube = event.target.getComponent(Cube);      
+    const cube = event.target.getComponent(Cube);  
+    if (cube && this._guide && (cube.node.name != "cube_11" || cube.getComponent(Sprite).spriteFrame.name != "0")) { 
+      return;
+    }
     if (cube) {
+      Sound.ins.playOneShot(Sound.effect.click);
       this._selectedCube = cube;  // 清空之前的选择
       this._originalPos = cube.node.getPosition();  // 记录原始位置
       this.markCube(cube);
@@ -74,9 +83,11 @@ export class CubeManagerBll  {
 
   private onTouchEnd(e: CubeManager, event: EventTouch) {
     if (!this._selectedCube) return;
-    if (this._selectedCube.name = "cube_11") {
-      EventBus.instance.emit(EventBus.UpdateTimer); //恢复计时
-    }
+    // console.log(this._selectedCube.getComponent(Sprite).spriteFrame.name == "0");
+    // console.log(this._selectedCube.node.name);
+    // if (this._selectedCube.node.name == "cube_11" && this._selectedCube.getComponent(Sprite).spriteFrame.name == "0") {
+    //   EventBus.instance.emit(EventBus.UpdateTimer); //恢复计时
+    // }
     const pos = event.getUILocation();
     const centerPos = this.uiToCenterOrigin(pos.toVec3());
     
@@ -95,6 +106,15 @@ export class CubeManagerBll  {
           minDistance = distanceSq;
           nearestGrid = { row, col };
         }
+      }
+    }
+    if (this._selectedCube.node.name == "cube_11" && this._selectedCube.getComponent(Sprite).spriteFrame.name == "0") {      
+       if (nearestGrid.col != 3 || nearestGrid.row != 3) {
+        this._selectedCube.moveTo(this._originalPos);
+        this._selectedCube = null;
+        this._originalPos = null;
+        EventBus.instance.emit(EventBus.UpdateTimer); //恢复计时        
+        return;
       }
     }
     
@@ -147,7 +167,7 @@ export class CubeManagerBll  {
    * @param data 麻将数据
    * @param offsetIndex 从顶部掉落时的偏移索引（用于错开生成位置）
    */
-  public createCube(e: CubeManager, data: any, offsetIndex: number = -1) {
+  public createCube(e: CubeManager, data: any, offsetIndex: number = -1) {    
     resources.load(`cube/cube`, Prefab, (err, prefab) => {
       if (err) {
         console.error(err);
@@ -320,6 +340,11 @@ export class CubeManagerBll  {
             }
           }
           
+          if(this._guide){
+            this._guide = false;
+          }
+          EventBus.instance.emit(JumpEvent.onJump); // 触发跳跃事件
+          Sound.ins.playOneShot(Sound.effect.pair);
           // 在传入cube的位置生成新cube
           const newId = this.getUpgradedId(value);
           setTimeout(() => {
@@ -382,5 +407,18 @@ export class CubeManagerBll  {
     // 根据游戏规则返回升级后的id，这里简单返回+1
     // 实际可能需要一个映射表
     return math.clamp(currentId + 1, 1, 8);
+  }
+
+
+  /** 根据行和列获取cube的位置
+   * @param e CubeManager实例
+   * @param row 行
+   * @param col 列
+   * @returns cube的位置
+   */  
+  private setMask(e: CubeManager, boolean: boolean) {
+    for (const cube of e.model.cubes) {
+      cube.node.children[0].active = boolean;
+    }
   }
 }

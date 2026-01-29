@@ -5,4 +5,6 @@ export enum GuideEvent {
     ShowHand = "ShowHand",
     
     StopShowGuide = "StopShowGuide",
+
+    ShowMask = "ShowMask",
 }

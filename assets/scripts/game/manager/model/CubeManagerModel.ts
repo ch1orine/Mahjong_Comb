@@ -163,8 +163,6 @@ export class CubeManagerModel {
     return allIds[Math.floor(Math.random() * allIds.length)];
   }
 
-  private checkIsBar(val: number): boolean {
-    return this._barMap.includes(val);
-  }  
+
   
 }
