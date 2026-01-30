@@ -37,7 +37,7 @@ export class EffectManager {
       node.destroy();      
     });
     setTimeout(() => {
-      Sound.ins.playOneShot(Sound.effect.boom);
+      // Sound.ins.playOneShot(Sound.effect.boom);
     }, 300);    
   }
 }

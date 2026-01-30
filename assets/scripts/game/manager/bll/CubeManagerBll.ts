@@ -344,7 +344,7 @@ export class CubeManagerBll  {
             this._guide = false;
           }
           EventBus.instance.emit(JumpEvent.onJump); // 触发跳跃事件
-          Sound.ins.playOneShot(Sound.effect.pair);
+          // Sound.ins.playOneShot(Sound.effect.pair);
           // 在传入cube的位置生成新cube
           const newId = this.getUpgradedId(value);
           setTimeout(() => {
@@ -353,6 +353,7 @@ export class CubeManagerBll  {
               row: cube.model.row,
               col: cube.model.col
             });
+            Sound.ins.playOneShot(Sound.effect.pair);
             e.model.updateMapValue(cube.model.row, cube.model.col, newId);
             EventBus.instance.emit(EventBus.AddScore);  // 增加分数
             EventBus.instance.emit(EffectEvent.ShowBoom, cube.node.getWorldPosition());            

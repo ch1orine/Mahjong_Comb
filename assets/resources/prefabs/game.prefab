@@ -777,11 +777,11 @@
     "node": {
       "__id__": 3
     },
-    "_enabled": false,
+    "_enabled": true,
     "__prefab": {
       "__id__": 31
     },
-    "_alignFlags": 17,
+    "_alignFlags": 41,
     "_target": null,
     "_left": 0,
     "_right": 0,
@@ -795,10 +795,10 @@
     "_isAbsBottom": true,
     "_isAbsHorizontalCenter": true,
     "_isAbsVerticalCenter": true,
-    "_originalWidth": 0,
+    "_originalWidth": 720,
     "_originalHeight": 0,
     "_alignMode": 2,
-    "_lockFlags": 0,
+    "_lockFlags": 40,
     "_id": ""
   },
   {
@@ -952,11 +952,11 @@
     "node": {
       "__id__": 33
     },
-    "_enabled": false,
+    "_enabled": true,
     "__prefab": {
       "__id__": 39
     },
-    "_alignFlags": 20,
+    "_alignFlags": 44,
     "_target": null,
     "_left": 0,
     "_right": 0,
@@ -970,10 +970,10 @@
     "_isAbsBottom": true,
     "_isAbsHorizontalCenter": true,
     "_isAbsVerticalCenter": true,
-    "_originalWidth": 0,
+    "_originalWidth": 720,
     "_originalHeight": 0,
     "_alignMode": 2,
-    "_lockFlags": 0,
+    "_lockFlags": 40,
     "_id": ""
   },
   {
